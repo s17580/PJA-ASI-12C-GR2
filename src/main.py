@@ -1,4 +1,6 @@
+import pickle
 import pandas as pd
+from sklearn.base import is_classifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
@@ -83,6 +85,8 @@ def evaluateModel(x_test, y_test, classifier):
 
 
 # ModelRelease
+with open('pokemon_classifier.pkl', 'wb') as f:
+    pickle.dump((prepareData, is_classifier), f) 
 # Run modules
 x_train, x_test, y_train, y_test, clf = prepareData()
 classifier = machineLearning(x_train, x_test, y_train, y_test, clf)
