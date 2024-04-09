@@ -11,12 +11,12 @@ Przedwsięzięcie realizowane w ramach przedmiotu ASI na Polsko-Japońskiej Akad
 
 ### Dataset
 
-- **Źródło:** [link](https://github.com/pycaret/pycaret/blob/master/datasets/pokemon.csv)
-- **Liczba rekordów:** 800
-- **Liczba zmiennych:** 13
-- **Plik:** pokemon.csv
-- **Rozmiar pliku:** 44 KB
-- **Predykowana zmienna:** "Legendary"
+- **Źródło:** <https://github.com/pycaret/pycaret/blob/master/datasets/pokemon.csv>  
+- **Liczba rekordów:** 800  
+- **Liczba zmiennych:** 13  
+- **Plik:** pokemon.csv  
+- **Rozmiar pliku:** 44 KB  
+- **Predykowana zmienna:** "Legendary"  
 
 ## Autorzy
 
@@ -45,9 +45,9 @@ Procedura wspierana dla następujących wersji oprogramowania:
 
 ### Instalacja Anacondy
 
-**1.** Pobierz dystrybucję Anaconda z oficjalnej strony: [link](https://www.anaconda.com/download/)
+**1.** Pobierz dystrybucję Anaconda z oficjalnej strony: <https://www.anaconda.com/download/>
 **2.** Zweryfikuj hashu pliku instalacyjnego.
-    - Hash pliku instalacyjnego sprawdzić na stronie: [link](https://docs.anaconda.com/free/anaconda/hashes/)
+    - Hash pliku instalacyjnego sprawdzić na stronie: <https://docs.anaconda.com/free/anaconda/hashes/>
     - Wykonać następujące polecenie powershell, wskazując plik instalacyjny Anacondy: `Get-FileHash "Anaconda3-2024.02-1-Windows-x86_64.exe" -Algorithm SHA256`. Należy podmienić nazwę pliku, jeśli jest inna.
     - Porównaj uzyskany hash z hashem uwzględnionym na oficjalnej stronie Anacondy, podanej w punkcie **1.** procedury. Jeśli się zgadza, możesz przystąpić do realizacji kolejnego punktu procedury.
 **3.** Zainstaluj Anacondę, korzystając z pobranego pliku instalacyjnego.
