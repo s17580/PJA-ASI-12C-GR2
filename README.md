@@ -7,14 +7,14 @@ Machine Learning Operations Projekt z przedmiotu ASI
 ### Problematyka
 
 Celem projektu jest przewidzenie czy dany obiekt (Pokemon), po nadaniu mu pewnego zestawu wartości, zostanie uznany za "Legendarnego".
-Przedwsięzięcie realizowane w ramach przedmiotu ASI na Polsko-Japońskiej Akademii Technik Komputerowych.
+Przedwsięzięcie realizowane w ramach przedmiotu ASI na Polsko-Japońskiej Akademii Technik Komputerowych w Warszawie.
 
 ### Dataset
 
 - **Źródło:** <https://github.com/pycaret/pycaret/blob/master/datasets/pokemon.csv>  
 - **Liczba rekordów:** 800  
 - **Liczba zmiennych:** 13  
-- **Plik:** pokemon.csv  
+- **Plik z danymi:** pokemon.csv  
 - **Rozmiar pliku:** 44 KB  
 - **Predykowana zmienna:** "Legendary"  
 
@@ -29,7 +29,7 @@ Przedwsięzięcie realizowane w ramach przedmiotu ASI na Polsko-Japońskiej Akad
 
 ### 1. Główny branch **"main"** zawiera aktualnie obowiązujące i zatwierdzone przez wszystkich autorów wersje plików projektowych
 
-### 2. Dodawanie poszczególnych funkcjonalności i aktualizacje w projekcie są wdrażane według następującego schematu
+### 2. Dodawanie poszczególnych funkcjonalności i wszelkie aktualizacje w projekcie wdrażane są według określone schematu
 
 - Autor wdrażający funkcjonalność tworzy brancha o nazwie zgodnej ze standardem: "feature/[inicjał]/[funkcjonalność]". Na przykład: "feature/eg/MachineLearning".  
 - Wykonanie commitów wdrażających zmiany do brancha.  
@@ -49,7 +49,7 @@ Procedura wspierana dla następujących wersji oprogramowania:
 
 #### 1. Pobierz dystrybucję Anaconda z oficjalnej strony: <https://www.anaconda.com/download/>
 
-#### 2. Zweryfikuj hashu pliku instalacyjnego
+#### 2. Zweryfikuj hash pliku instalacyjnego
 
 - Hash pliku instalacyjnego sprawdzić na stronie: <https://docs.anaconda.com/free/anaconda/hashes/>  
 - Wykonać następujące polecenie powershell, wskazując plik instalacyjny Anacondy: `Get-FileHash "Anaconda3-2024.02-1-Windows-x86_64.exe" -Algorithm SHA256`. Należy podmienić nazwę pliku, jeśli jest inna.  
@@ -66,5 +66,5 @@ Procedura wspierana dla następujących wersji oprogramowania:
 **1.** Z katalogu **"config"** z repozytorium projektu pobierz pliki: *"import-conda-environment.ps1"* oraz *"PJA-ASI-12C-GR2.yaml"*.  
 **2.** Umieść pobrane pliki w tej samej lokalizacji.  
 **3.** Uruchom konsolę **Anaconda Powershell** i przejdź lokalizacji, w której znajdują się pobrane pliki.  
-**4.** Uruchomić skrypt *"import-conda-environment.ps1"*.  
-**5.** Po poprawnym imporcie środowsika, w konsoli powinien pojawić się komunikat: "Environment PJA-ASI-12C-GR2 created and activated.".  
+**4.** Uruchomić skrypt *`import-conda-environment.ps1`*.  
+**5.** Po poprawnym imporcie środowiska, w konsoli powinien pojawić się komunikat: *"Environment PJA-ASI-12C-GR2 created and activated."*.  
