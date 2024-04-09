@@ -85,9 +85,13 @@ def evaluate_model(x_test, y_test, classifier):
 
 
 # Model release
-with open("pokemon_classifier.pkl", "wb") as f:
-    pickle.dump((prepare_data, is_classifier), f)
+def release_model():
+    with open("pokemon_classifier.pkl", "wb") as f:
+        pickle.dump((prepare_data, is_classifier), f)
+
+
 # Run modules
 x_train, x_test, y_train, y_test, clf = prepare_data()
 classifier = machine_learning(x_train, x_test, y_train, y_test, clf)
 evaluate_model(x_test, y_test, classifier)
+release_model()
