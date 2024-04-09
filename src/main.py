@@ -15,15 +15,15 @@ from sklearn.metrics import (
 )
 
 
-# Load Data
-def loadData():
-    df = pd.read_csv("pokemon.csv", index_col=False)
+# Load data
+def load_data():
+    df = pd.read_csv("data\\pokemon.csv", index_col=False)
     return df
 
 
-# Prepare Data
-def prepareData():
-    df = loadData()
+# Prepare data
+def prepare_data():
+    df = load_data()
     df["Type 2"] = df["Type 2"].fillna("None")  # Filling missing values
 
     # Features and Labels
@@ -62,13 +62,13 @@ def prepareData():
 
 
 # Machine Learning - Decision Tree Classifier
-def machineLearning(x_train, x_test, y_train, y_test, clf):
+def machine_learning(x_train, x_test, y_train, y_test, clf):
     clf.fit(x_train, y_train)
     return clf
 
 
-# ModelEvaluation
-def evaluateModel(x_test, y_test, classifier):
+# Model evaluation
+def evaluate_model(x_test, y_test, classifier):
     y_pred = classifier.predict(x_test)
 
     accuracy = accuracy_score(y_test, y_pred)
@@ -84,10 +84,10 @@ def evaluateModel(x_test, y_test, classifier):
     print("Confusion Matrix:\n", conf_matrix)
 
 
-# ModelRelease
-with open('pokemon_classifier.pkl', 'wb') as f:
-    pickle.dump((prepareData, is_classifier), f) 
+# Model release
+with open("pokemon_classifier.pkl", "wb") as f:
+    pickle.dump((prepare_data, is_classifier), f)
 # Run modules
-x_train, x_test, y_train, y_test, clf = prepareData()
-classifier = machineLearning(x_train, x_test, y_train, y_test, clf)
-evaluateModel(x_test, y_test, classifier)
+x_train, x_test, y_train, y_test, clf = prepare_data()
+classifier = machine_learning(x_train, x_test, y_train, y_test, clf)
+evaluate_model(x_test, y_test, classifier)
