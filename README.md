@@ -20,10 +20,10 @@ Przedwsięzięcie realizowane w ramach przedmiotu ASI na Polsko-Japońskiej Akad
 
 ## Autorzy
 
-Adam Kaczkowski - s23020
-Karol Tusiński - s17580
-Eryk Gregorczyk - s20454
-Patryk Siedlik - s22811
+Adam Kaczkowski - s23020  
+Karol Tusiński - s17580  
+Eryk Gregorczyk - s20454  
+Patryk Siedlik - s22811  
 
 ## Polityka branchowania i zatwierdzania zmian w repozytorium Github
 
