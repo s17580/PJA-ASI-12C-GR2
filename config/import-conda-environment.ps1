@@ -37,5 +37,5 @@ conda env create -f $envFile -n $envName
 
 # Activate environment
 conda activate PJA-ASI-12C-GR2
-Write-Host "Environment '$envName' created and activated." -ForegroundColor Green
+Write-Host "Environment '$envName' successfully created and activated." -ForegroundColor Green
 conda env list
