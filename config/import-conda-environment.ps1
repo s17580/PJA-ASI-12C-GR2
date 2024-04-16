@@ -36,6 +36,6 @@ conda config --set channel_priority strict
 conda env create -f $envFile -n $envName
 
 # Activate environment
-conda activate PJA-ASI-12C-GR2
+conda activate $envName
 Write-Host "Environment '$envName' successfully created and activated." -ForegroundColor Green
 conda env list
