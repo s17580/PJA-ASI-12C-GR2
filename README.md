@@ -29,7 +29,7 @@ Przedwsięzięcie realizowane w ramach przedmiotu ASI na Polsko-Japońskiej Akad
 
 ### 1. Główny branch **"main"** zawiera aktualnie obowiązujące i zatwierdzone przez wszystkich autorów wersje plików projektowych
 
-### 2. Dodawanie poszczególnych funkcjonalności i wszelkie aktualizacje w projekcie wdrażane są według określone schematu
+### 2. Dodawanie poszczególnych funkcjonalności i wszelkie aktualizacje w projekcie wdrażane są według określonego schematu
 
 - Autor wdrażający funkcjonalność tworzy brancha o nazwie zgodnej ze standardem: "feature/[inicjał]/[funkcjonalność]". Na przykład: "feature/eg/MachineLearning".  
 - Wykonanie commitów wdrażających zmiany do brancha.  
