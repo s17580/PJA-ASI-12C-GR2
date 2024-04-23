@@ -1,7 +1,6 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
 from .nodes import (
-    transform_data,
     machine_learning,
     evaluate_model,
 )
@@ -11,16 +10,10 @@ def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
             node(
-                func=transform_data,
-                inputs="pokemons",
-                outputs=["x_train", "x_test", "y_train", "y_test", "clf"],
-                name="transform_data_node",
-            ),
-            node(
                 func=machine_learning,
-                inputs=["x_train", "x_test", "y_train", "y_test", "clf"],
+                inputs=["x_train", "x_val", "y_train", "y_val", "preprocessor"],
                 outputs="classifier",
-                name="machine_learning_node",
+                name="machine_learning",
             ),
             node(
                 func=evaluate_model,
