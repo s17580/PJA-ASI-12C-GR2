@@ -175,7 +175,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
-env/
+# env/
 venv/
 ENV/
 env.bak/
@@ -214,3 +214,8 @@ cython_debug/
 
 # VSCode settings
 .vscode/
+
+# Custom files
+.telemetry
+session_store.db
+Pipe

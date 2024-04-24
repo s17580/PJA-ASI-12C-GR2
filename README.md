@@ -63,8 +63,8 @@ Procedura wspierana dla następujących wersji oprogramowania:
 
 ### Import środowiska Conda
 
-**1.** Z katalogu **"config"** z repozytorium projektu pobierz pliki: *"import-conda-environment.ps1"* oraz *"PJA-ASI-12C-GR2.yaml"*.  
-**2.** Umieść pobrane pliki w tej samej lokalizacji.  
+**1.** Z katalogu **"env"** z repozytorium projektu pobierz pliki: *"import-conda-environment.ps1"* oraz *"PJA-ASI-12C-GR2.yaml"*.  
+**2.** Umieść pobrane pliki w tej samej ścieżce na lokalnym hoście.  
 **3.** Uruchom konsolę **Anaconda Powershell** i przejdź lokalizacji, w której znajdują się pobrane pliki.  
 **4.** Uruchomić skrypt *`import-conda-environment.ps1`*.  
 **5.** Po poprawnym imporcie środowiska, w konsoli powinien pojawić się komunikat: *"Environment PJA-ASI-12C-GR2 successfully created and activated."*.  
