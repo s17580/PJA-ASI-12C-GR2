@@ -1,0 +1,29 @@
+#DecisionTreeClassifier z różnymi parametrami i małym zestawem testowym:
+kedro run --params="machine_learning.decision_tree.classifier_type='DecisionTreeClassifier',machine_learning.decision_tree.max_depth=12,machine_learning.decision_tree.min_samples_split=5,machine_learning.decision_tree.random_state=101,split_data.test_size=0.1,split_data.val_size=0.2,split_data.random_state=101"
+
+# RandomForestClassifier z dużą liczbą estymatorów i dużym zestawem testowym:
+kedro run --params="machine_learning.random_forest.classifier_type='RandomForestClassifier',machine_learning.random_forest.n_estimators=300,machine_learning.random_forest.max_depth=20,machine_learning.random_forest.random_state=102,split_data.test_size=0.3,split_data.val_size=0.2,split_data.random_state=102"
+
+# SVC z niskim parametrem C dla zwiększenia generalizacji:
+kedro run --params="machine_learning.svc.classifier_type='SVC',machine_learning.svc.C=0.5,machine_learning.svc.kernel='linear',machine_learning.svc.gamma='auto',machine_learning.svc.random_state=103,split_data.test_size=0.15,split_data.val_size=0.25,split_data.random_state=103"
+
+# GradientBoostingClassifier z bardzo niskim learning rate dla obserwacji wpływu na szybkość uczenia:
+kedro run --params="machine_learning.gradient_boosting.classifier_type='GradientBoostingClassifier',machine_learning.gradient_boosting.n_estimators=150,machine_learning.gradient_boosting.learning_rate=0.01,machine_learning.gradient_boosting.max_depth=4,machine_learning.gradient_boosting.random_state=104,split_data.test_size=0.25,split_data.val_size=0.1,split_data.random_state=104"
+
+# RandomForestClassifier z bardzo wysokim głębieniem i małą liczbą drzew:
+kedro run --params="machine_learning.random_forest.classifier_type='RandomForestClassifier',machine_learning.random_forest.n_estimators=50,machine_learning.random_forest.max_depth=30,machine_learning.random_forest.random_state=105,split_data.test_size=0.2,split_data.val_size=0.3,split_data.random_state=105"
+
+# SVC z wysokim parametrem C i innym jądrem:
+kedro run --params="machine_learning.svc.classifier_type='SVC',machine_learning.svc.C=2.0,machine_learning.svc.kernel='poly',machine_learning.svc.gamma='scale',machine_learning.svc.random_state=106,split_data.test_size=0.2,split_data.val_size=0.2,split_data.random_state=106"
+
+# DecisionTreeClassifier z maksymalną głębokością i różnymi próbkami do podziału:
+kedro run --params="machine_learning.decision_tree.classifier_type='DecisionTreeClassifier',machine_learning.decision_tree.max_depth=None,machine_learning.decision_tree.min_samples_split=10,machine_learning.decision_tree.random_state=107,split_data.test_size=0.1,split_data.val_size=0.1,split_data.random_state=107"
+
+# GradientBoostingClassifier z dużą liczbą estymatorów i różnymi szybkościami uczenia:
+kedro run --params="machine_learning.gradient_boosting.classifier_type='GradientBoostingClassifier',machine_learning.gradient_boosting.n_estimators=200,machine_learning.gradient_boosting.learning_rate=0.2,machine_learning.gradient_boosting.max_depth=5,machine_learning.gradient_boosting.random_state=108,split_data.test_size=0.25,split_data.val_size=0.15,split_data.random_state=108"
+
+# SVC z parametrem gamma 'auto' dla różnych jąder:
+kedro run --params="machine_learning.svc.classifier_type='SVC',machine_learning.svc.C=1.2,machine_learning.svc.kernel='rbf',machine_learning.svc.gamma='auto',machine_learning.svc.random_state=109,split_data.test_size=0.2,split_data.val_size=0.3,split_data.random_state=109"
+
+# RandomForestClassifier z różnymi ustawieniami dla bootstrap i random state:
+kedro run --params="machine_learning.random_forest.classifier_type='RandomForestClassifier',machine_learning.random_forest.n_estimators=100,machine_learning.random_forest.max_depth=15,machine_learning.random_forest.bootstrap=false,machine_learning.random_forest.random_state=110,split_data.test_size=0.15,split_data.val_size=0.25,split_data.random_state=110"
