@@ -1,24 +1,20 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import (
-    machine_learning,
-    evaluate_model,
-)
-
+from .nodes import machine_learning, evaluate_model
 
 def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
             node(
                 func=machine_learning,
-                inputs=["x_train", "x_val", "y_train", "y_val", "preprocessor"],
+                inputs=["x_train", "x_val", "y_train", "y_val", "preprocessor", "params:machine_learning.decision_tree"],
                 outputs="classifier",
-                name="machine_learning",
+                name="machine_learning"
             ),
             node(
                 func=evaluate_model,
                 inputs=["x_test", "y_test", "classifier"],
-                outputs="release_model",
-            ),
+                outputs="release_model"
+            )
         ]
     )
