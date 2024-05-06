@@ -1,4 +1,5 @@
 import logging
+import os
 import wandb
 import pandas as pd
 from kedro.io import DataCatalog
@@ -76,7 +77,7 @@ def evaluate_model(
     f1 = f1_score(y_test, y_pred, average="weighted")
 
     # Inicjalizacja sesji wandb
-    wandb.init(project="actions")
+    wandb.init(project="actions", dir=os.path.abspath("."))
 
     # Logowanie metryk
     wandb.log(
