@@ -10,23 +10,27 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Conda
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        activate-environment: PJA-ASI-12C-GR2
-        environment-file: env/Conda/PJA-ASI-12C-GR2.yaml
-        auto-activate-base: false
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: PJA-ASI-12C-GR2
+          environment-file: env/Conda/PJA-ASI-12C-GR2.yaml
+          auto-activate-base: false
 
-    - name: Install dependencies
-      shell: bash -l {0}
-      run: |
-        conda env update --file env/Conda/PJA-ASI-12C-GR2.yaml --prune
+      - name: Install dependencies
+        shell: bash -l {0}
+        run: |
+          conda env update --file env/Conda/PJA-ASI-12C-GR2.yaml --prune
 
-    - name: Log in to Weights & Biases
-      run: wandb login ${{ secrets.WANDB_API_KEY }}
+      - name: Install wandb
+        shell: bash
+        run: pip install wandb
 
-    - name: Run script
-      run: |
-        kedro run
+      - name: Log in to Weights & Biases
+        run: wandb login ${{ secrets.WANDB_API_KEY }}
+
+      - name: Run script
+        run: |
+          kedro run
