@@ -8,20 +8,28 @@ from sklearn.base import ClassifierMixin
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+)
 from typing import Dict, Any
+
 
 def create_error_logger() -> logging.Logger:
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.ERROR)
     return logger
 
+
 def get_classifier(classifier_type: str, params: Dict[str, Any]) -> ClassifierMixin:
     classifiers = {
         "DecisionTreeClassifier": DecisionTreeClassifier,
         "RandomForestClassifier": RandomForestClassifier,
         "SVC": SVC,
-        "GradientBoostingClassifier": GradientBoostingClassifier
+        "GradientBoostingClassifier": GradientBoostingClassifier,
     }
     if classifier_type not in classifiers:
         raise ValueError(f"Unsupported classifier type: {classifier_type}")
@@ -29,46 +37,51 @@ def get_classifier(classifier_type: str, params: Dict[str, Any]) -> ClassifierMi
     # Poprawiona obsługa None i konwersja typów
     for key, value in list(params.items()):
         if isinstance(value, str):
-            if value == 'None':
+            if value == "None":
                 params[key] = None
             elif value.isdigit():
                 params[key] = int(value)
 
-    params = {key: value for key, value in params.items() if key != 'classifier_type'}
+    params = {key: value for key, value in params.items() if key != "classifier_type"}
     return classifiers[classifier_type](**params)
 
-def machine_learning(x_train: pd.DataFrame, x_val: pd.DataFrame, y_train: pd.Series, y_val: pd.Series, preprocessor: ColumnTransformer, params: Dict[str, Any]) -> Pipeline:
+
+def machine_learning(
+    x_train: pd.DataFrame,
+    x_val: pd.DataFrame,
+    y_train: pd.Series,
+    y_val: pd.Series,
+    preprocessor: ColumnTransformer,
+    params: Dict[str, Any],
+) -> Pipeline:
     logger = create_error_logger()
     try:
-        classifier = get_classifier(params['classifier_type'], params)
-        clf = Pipeline([
-            ("preprocessor", preprocessor),
-            ("classifier", classifier)
-        ])
+        classifier = get_classifier(params["classifier_type"], params)
+        clf = Pipeline([("preprocessor", preprocessor), ("classifier", classifier)])
         clf.fit(x_train, y_train)
         return clf
     except Exception as e:
         logger.error(f"Failed to train classifier: {e}")
         raise
 
-def evaluate_model(x_test: pd.DataFrame, y_test: pd.Series, classifier: Pipeline) -> Dict[str, Any]:
+
+def evaluate_model(
+    x_test: pd.DataFrame, y_test: pd.Series, classifier: Pipeline
+) -> Dict[str, Any]:
     y_pred = classifier.predict(x_test)
 
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    f1 = f1_score(y_test, y_pred, average='weighted')
+    precision = precision_score(y_test, y_pred, average="weighted")
+    recall = recall_score(y_test, y_pred, average="weighted")
+    f1 = f1_score(y_test, y_pred, average="weighted")
 
     # Inicjalizacja sesji wandb
-    wandb.init(project="your-project-name")
+    wandb.init(project="actions")
 
     # Logowanie metryk
-    wandb.log({
-        "accuracy": accuracy,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1
-    })
+    wandb.log(
+        {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
+    )
 
     return {
         "accuracy": accuracy,
@@ -76,6 +89,7 @@ def evaluate_model(x_test: pd.DataFrame, y_test: pd.Series, classifier: Pipeline
         "recall": recall,
         "f1": f1,
     }
+
 
 def release_model(catalog: DataCatalog, evaluation_results: dict, classifier):
     logger = create_error_logger()
