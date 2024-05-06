@@ -77,6 +77,7 @@ def evaluate_model(
     f1 = f1_score(y_test, y_pred, average="weighted")
 
     # Inicjalizacja sesji wandb
+    os.chdir("C:")
     wandb.init(project="actions", dir=os.path.abspath("."))
 
     # Logowanie metryk
