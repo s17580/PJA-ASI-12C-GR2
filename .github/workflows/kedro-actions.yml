@@ -41,7 +41,8 @@ jobs:
       - name: Run script
         shell: bash -l {0}
         run: |
-          kedro run
+          kedro run --params="machine_learning.random_forest.classifier_type='RandomForestClassifier',machine_learning.random_forest.n_estimators=300,machine_learning.random_forest.max_depth=20,machine_learning.random_forest.random_state=102,split_data.test_size=0.3,split_data.val_size=0.2,split_data.random_state=102"
+
 
       - name: Conda info
         shell: bash -l {0}
