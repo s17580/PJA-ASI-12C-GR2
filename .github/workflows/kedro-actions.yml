@@ -21,16 +21,19 @@ jobs:
           activate-environment: PJA-ASI-12C-GR2
           auto-activate-base: false
 
-      - name: Install dependencies
-        shell: bash -l {0}
+      - name: Create .env directory
+        shell: powershell
         run: |
-          conda env update --file env/Conda/PJA-ASI-12C-GR2.yaml --prune
+          $envPath = "$CONDA_PREFIX/envs/PJA-ASI-12C-GR2"
+          if (-Not (Test-Path $envPath)) {
+            New-Item -ItemType Directory -Path $envPath
+          }
 
       - name: Log in to Weights & Biases
+        shell: powershell
         run: |
-          echo "WANDB_API_KEY=${{ secrets.WANDB_API_KEY }}" > $CONDA_PREFIX/envs/PJA-ASI-12C-GR2/.env
-          source $CONDA_PREFIX/envs/PJA-ASI-12C-GR2/.env
-          wandb login
+          $envFile = "$CONDA_PREFIX/envs/PJA-ASI-12C-GR2/.env"
+          "WANDB_API_KEY=${{ secrets.WANDB_API_KEY }}" | Out-File -FilePath $envFile
 
       - name: Run script
         shell: bash -l {0}
