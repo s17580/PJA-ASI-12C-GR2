@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -41,9 +42,7 @@ jobs:
       - name: Run script
         shell: bash -l {0}
         run: |
-          kedro run --params="machine_learning.gradient_boosting.classifier_type='GradientBoostingClassifier',machine_learning.gradient_boosting.n_estimators=200,machine_learning.gradient_boosting.learning_rate=0.2,machine_learning.gradient_boosting.max_depth=5,machine_learning.gradient_boosting.random_state=108,split_data.test_size=0.25,split_data.val_size=0.15,split_data.random_state=108"
-
-
+          kedro run --params="machine_learning.svc.classifier_type='SVC',machine_learning.svc.C=0.5,machine_learning.svc.kernel='linear',machine_learning.svc.gamma='auto',machine_learning.svc.random_state=103,split_data.test_size=0.15,split_data.val_size=0.25,split_data.random_state=103"
 
       - name: Conda info
         shell: bash -l {0}
