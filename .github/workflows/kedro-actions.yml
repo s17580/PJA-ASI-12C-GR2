@@ -31,7 +31,7 @@ jobs:
           wandb login ${{ secrets.WANDB_API_KEY }}
 
       - name: Run script
-        shell: cmd /C call {0}
+        shell: cmd /D call {0}
         run: |
           conda activate PJA-ASI-12C-GR2
           kedro run
