@@ -35,6 +35,9 @@ jobs:
           $envFile = "$CONDA_PREFIX/envs/PJA-ASI-12C-GR2/.env"
           "WANDB_API_KEY=${{ secrets.WANDB_API_KEY }}" | Out-File -FilePath $envFile
 
+      - name: Log in to Weights & Biases
+        run: wandb login ${{ secrets.WANDB_API_KEY }}
+
       - name: Run script
         shell: bash -l {0}
         run: |
