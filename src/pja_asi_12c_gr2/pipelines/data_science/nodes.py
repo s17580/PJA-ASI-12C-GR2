@@ -1,4 +1,5 @@
 import logging
+import wandb
 import pandas as pd
 from kedro.io import DataCatalog
 from sklearn.pipeline import Pipeline
@@ -51,20 +52,30 @@ def machine_learning(x_train: pd.DataFrame, x_val: pd.DataFrame, y_train: pd.Ser
         raise
 
 def evaluate_model(x_test: pd.DataFrame, y_test: pd.Series, classifier: Pipeline) -> Dict[str, Any]:
-    logger = create_error_logger()
-    try:
-        y_pred = classifier.predict(x_test)
-        evaluation_results = {
-            "accuracy": accuracy_score(y_test, y_pred),
-            "precision": precision_score(y_test, y_pred, average='binary'),
-            "recall": recall_score(y_test, y_pred, average='binary'),
-            "f1_score": f1_score(y_test, y_pred, average='binary'),
-            "confusion_matrix": confusion_matrix(y_test, y_pred).tolist()
-        }
-        return evaluation_results
-    except Exception as e:
-        logger.error(f"Error during model evaluation: {e}")
-        raise
+    y_pred = classifier.predict(x_test)
+
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted')
+
+    # Inicjalizacja sesji wandb
+    wandb.init(project="your-project-name")
+
+    # Logowanie metryk
+    wandb.log({
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1
+    })
+
+    return {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+    }
 
 def release_model(catalog: DataCatalog, evaluation_results: dict, classifier):
     logger = create_error_logger()
