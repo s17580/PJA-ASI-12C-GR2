@@ -18,20 +18,20 @@ jobs:
           activate-environment: PJA-ASI-12C-GR2
           environment-file: env/Conda/PJA-ASI-12C-GR2.yaml
           auto-activate-base: false
-          auto-update-conda: true
-          use-only-tar-bz2: true
 
       - name: Install dependencies
-        shell: bash -el {0}
+        shell: bash -l {0}
         run: |
+          conda activate PJA-ASI-12C-GR2
           conda env update --file env/Conda/PJA-ASI-12C-GR2.yaml --prune
 
       - name: Log in to Weights & Biases
-        shell: bash -el {0}
         run: |
+          conda activate PJA-ASI-12C-GR2
           wandb login ${{ secrets.WANDB_API_KEY }}
 
       - name: Run script
-        shell: bash -el {0}
+        shell: cmd /C call {0}
         run: |
+          conda activate PJA-ASI-12C-GR2
           kedro run
