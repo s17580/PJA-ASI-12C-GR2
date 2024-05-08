@@ -1,0 +1,59 @@
+name: W&B Report
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: 3.11
+          environment-file: env/Conda/PJA-ASI-12C-GR2.yaml
+          activate-environment: PJA-ASI-12C-GR2
+          auto-activate-base: false
+
+      - name: Create .env directory
+        shell: powershell
+        run: |
+          $envPath = "$CONDA_PREFIX/envs/PJA-ASI-12C-GR2"
+          if (-Not (Test-Path $envPath)) {
+            New-Item -ItemType Directory -Path $envPath
+          }
+
+      - name: Log in to Weights & Biases
+        shell: powershell
+        run: |
+          $envFile = "$CONDA_PREFIX/envs/PJA-ASI-12C-GR2/.env"
+          "WANDB_API_KEY=${{ secrets.WANDB_API_KEY }}" | Out-File -FilePath $envFile
+
+      - name: Log in to Weights & Biases
+        run: wandb login ${{ secrets.WANDB_API_KEY }}
+
+      - name: Run script
+        shell: bash -l {0}
+        run: |
+          kedro run --params="machine_learning.decision_tree.classifier_type='DecisionTreeClassifier',machine_learning.decision_tree.max_depth=12,machine_learning.decision_tree.min_samples_split=5,machine_learning.decision_tree.random_state=101,split_data.test_size=0.1,split_data.val_size=0.2,split_data.random_state=101"
+          kedro run --params="machine_learning.gradient_boosting.classifier_type='GradientBoostingClassifier',machine_learning.gradient_boosting.n_estimators=150,machine_learning.gradient_boosting.learning_rate=0.01,machine_learning.gradient_boosting.max_depth=4,machine_learning.gradient_boosting.random_state=104,split_data.test_size=0.25,split_data.val_size=0.1,split_data.random_state=104"
+          kedro run --params="machine_learning.random_forest.classifier_type='RandomForestClassifier',machine_learning.random_forest.n_estimators=50,machine_learning.random_forest.max_depth=30,machine_learning.random_forest.random_state=105,split_data.test_size=0.2,split_data.val_size=0.3,split_data.random_state=105"
+          kedro run --params="machine_learning.svc.classifier_type='SVC',machine_learning.svc.C=2.0,machine_learning.svc.kernel='poly',machine_learning.svc.gamma='scale',machine_learning.svc.random_state=106,split_data.test_size=0.2,split_data.val_size=0.2,split_data.random_state=106"
+          kedro run --params="machine_learning.decision_tree.classifier_type='DecisionTreeClassifier',machine_learning.decision_tree.max_depth=None,machine_learning.decision_tree.min_samples_split=10,machine_learning.decision_tree.random_state=107,split_data.test_size=0.1,split_data.val_size=0.1,split_data.random_state=107"
+          kedro run --params="machine_learning.svc.classifier_type='SVC',machine_learning.svc.C=1.2,machine_learning.svc.kernel='rbf',machine_learning.svc.gamma='auto',machine_learning.svc.random_state=109,split_data.test_size=0.2,split_data.val_size=0.3,split_data.random_state=109"
+          kedro run --params="machine_learning.random_forest.classifier_type='RandomForestClassifier',machine_learning.random_forest.n_estimators=100,machine_learning.random_forest.max_depth=15,machine_learning.random_forest.bootstrap=false,machine_learning.random_forest.random_state=110,split_data.test_size=0.15,split_data.val_size=0.25,split_data.random_state=110"
+
+      - name: Conda info
+        shell: bash -l {0}
+        run: conda info
+
+      - name: Conda list
+        shell: bash -l {0}
+        run: conda list
