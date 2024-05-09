@@ -78,7 +78,7 @@ def evaluate_model(
 
     # Inicjalizacja sesji wandb
     os.chdir("C:")
-    wandb.init(project="actions", dir=os.path.abspath("."))
+    wandb.init(project="PJA-ASI-12C-GR2", dir=os.path.abspath("."))
 
     # Logowanie metryk
     wandb.log(
