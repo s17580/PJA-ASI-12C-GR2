@@ -18,7 +18,7 @@ jobs:
         with:
           auto-update-conda: true
           python-version: 3.11
-          environment-file: env/Conda/PJA-ASI-12C-GR2.yaml
+          environment-file: env/PJA-ASI-12C-GR2.yaml
           activate-environment: PJA-ASI-12C-GR2
           auto-activate-base: false
 

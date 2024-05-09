@@ -1,8 +1,6 @@
-import logging
+from typing import Dict, Any
 import os
-import wandb
-import pandas as pd
-from kedro.io import DataCatalog
+import logging
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import ClassifierMixin
@@ -16,7 +14,9 @@ from sklearn.metrics import (
     f1_score,
     confusion_matrix,
 )
-from typing import Dict, Any
+from kedro.io import DataCatalog
+import pandas as pd
+import wandb
 
 
 def create_error_logger() -> logging.Logger:
@@ -35,16 +35,22 @@ def get_classifier(classifier_type: str, params: Dict[str, Any]) -> ClassifierMi
     if classifier_type not in classifiers:
         raise ValueError(f"Unsupported classifier type: {classifier_type}")
 
-    # Poprawiona obsługa None i konwersja typów
+    # None handling and types conversion
+    logger = create_error_logger()
     for key, value in list(params.items()):
         if isinstance(value, str):
             if value == "None":
                 params[key] = None
             elif value.isdigit():
                 params[key] = int(value)
-
-    params = {key: value for key, value in params.items() if key != "classifier_type"}
-    return classifiers[classifier_type](**params)
+    try:
+        params = {
+            key: value for key, value in params.items() if key != "classifier_type"
+        }
+        return classifiers[classifier_type](**params)
+    except TypeError as e:
+        logger.error(f"Type conversion error for classifier parameters: {e}")
+        raise
 
 
 def machine_learning(
@@ -69,28 +75,33 @@ def machine_learning(
 def evaluate_model(
     x_test: pd.DataFrame, y_test: pd.Series, classifier: Pipeline
 ) -> Dict[str, Any]:
-    y_pred = classifier.predict(x_test)
+    logger = create_error_logger()
+    try:
+        y_pred = classifier.predict(x_test)
 
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average="weighted")
-    recall = recall_score(y_test, y_pred, average="weighted")
-    f1 = f1_score(y_test, y_pred, average="weighted")
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred, average="weighted")
+        recall = recall_score(y_test, y_pred, average="weighted")
+        f1 = f1_score(y_test, y_pred, average="weighted")
 
-    # Inicjalizacja sesji wandb
-    os.chdir("C:")
-    wandb.init(project="actions", dir=os.path.abspath("."))
+        # Initialize wandb session
+        os.chdir("C:")
+        wandb.init(project="actions", dir=os.path.abspath("."))
 
-    # Logowanie metryk
-    wandb.log(
-        {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
-    )
+        # Log metrics in wandb
+        wandb.log(
+            {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
+        )
 
-    return {
-        "accuracy": accuracy,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1,
-    }
+        return {
+            "accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+        }
+    except (ValueError, KeyError, OSError) as e:
+        logger.error(f"Model evaluation error: {e}")
+        raise
 
 
 def release_model(catalog: DataCatalog, evaluation_results: dict, classifier):
