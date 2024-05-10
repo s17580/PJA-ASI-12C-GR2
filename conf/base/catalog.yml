@@ -2,20 +2,28 @@ pokemons:
   type: pandas.CSVDataset
   filepath: data/01_raw/pokemons.csv
 
-# preprocessed_pokemons:
-#   type: pandas.ParquetDataset
-#   filepath: data/02_intermediate/preprocessed_pokemons.pq
+prepared_pokemons:
+  type: pandas.CSVDataset
+  filepath: data/02_intermediate/prepared_pokemons.csv
+
+preprocessed_pokemons:
+  type: pandas.ParquetDataset
+  filepath: data/03_primary/preprocessed_pokemons.pq
 
 classifier:
   type: pickle.PickleDataset
-  filepath: data/06_models/pokemon_classifier.pk
+  filepath: data/04_models/pokemon_classifier.pk
   versioned: true
 
 release_model:
   type: pickle.PickleDataset
-  filepath: data/07_model_output/release_model.pk
+  filepath: data/05_model_output/release_model.pk
   versioned: true
 
-metrics:
-  type: tracking.MetricsDataset
-  filepath: data/09_tracking/metrics.json
+prepared_pokemons_columns:
+  type: tracking.JSONDataset
+  filepath: data/06_tracking/prepared_pokemons_columns.json
+
+# metrics:
+#   type: tracking.MetricsDataset
+#   filepath: data/06_tracking/metrics.json

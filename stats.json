@@ -1,1 +1,0 @@
-{"pokemons": {"rows": 800, "columns": 13, "file_size": 44829}, "preprocessed_pokemons": {"rows": 800, "columns": 12}, "x_train": {"rows": 680, "columns": 12}, "x_val": {"rows": 90, "columns": 12}, "x_test": {"rows": 30, "columns": 12}}

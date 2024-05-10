@@ -206,7 +206,9 @@ cython_debug/
 # VSCode settings
 .vscode/
 
-# Custom files
+# Custom
 .telemetry
 session_store.db
 Pipe
+stats.json
+wandb
