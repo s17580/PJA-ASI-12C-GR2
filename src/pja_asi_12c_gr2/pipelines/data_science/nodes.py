@@ -20,12 +20,32 @@ import wandb
 
 
 def create_error_logger() -> logging.Logger:
+    """
+    Creates and configures a logger for error handling.
+
+    Returns:
+        logging.Logger: A configured logger object set to log errors.
+    """
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.ERROR)
     return logger
 
 
 def get_classifier(classifier_type: str, params: Dict[str, Any]) -> ClassifierMixin:
+    """
+    Gets an instance of a classifier based on the provided type and parameters.
+
+    Args:
+        classifier_type: String specifying the type of classifier ("DecisionTreeClassifier", "RandomForestClassifier", "SVC", or "GradientBoostingClassifier").
+        params: A dictionary containing parameters to initialize the classifier.
+
+    Returns:
+        ClassifierMixin: An instance of the specified classifier.
+
+    Raises:
+        ValueError: If an unsupported classifier type is provided.
+        TypeError: If there's a type mismatch in the provided parameters.
+    """
     classifiers = {
         "DecisionTreeClassifier": DecisionTreeClassifier,
         "RandomForestClassifier": RandomForestClassifier,
@@ -61,6 +81,23 @@ def machine_learning(
     preprocessor: ColumnTransformer,
     params: Dict[str, Any],
 ) -> Pipeline:
+    """
+    Creates and trains a machine learning pipeline.
+
+    Args:
+        x_train: The training features.
+        x_val: The validation features.
+        y_train: The training labels.
+        y_val: The validation labels.
+        preprocessor: The preprocessor for feature engineering.
+        params: A dictionary of parameters for the classifier.
+
+    Returns:
+        Pipeline: The trained pipeline.
+
+    Raises:
+        Exception: If training fails.
+    """
     logger = create_error_logger()
     try:
         classifier = get_classifier(params["classifier_type"], params)
@@ -75,6 +112,22 @@ def machine_learning(
 def evaluate_model(
     x_test: pd.DataFrame, y_test: pd.Series, classifier: Pipeline
 ) -> Dict[str, Any]:
+    """
+    Evaluates a trained model on test data and logs metrics using wandb.
+
+    Args:
+        x_test: The test features.
+        y_test: The test labels.
+        classifier: The trained pipeline.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing evaluation metrics.
+
+    Raises:
+        ValueError: If an error occurs during evaluation.
+        KeyError: If metric logging fails.
+        OSError: If wandb initialization fails.
+    """
     logger = create_error_logger()
     try:
         y_pred = classifier.predict(x_test)
@@ -86,7 +139,7 @@ def evaluate_model(
 
         # Initialize wandb session
         os.chdir("C:")
-        wandb.init(project="actions", dir=os.path.abspath("."))
+        wandb.init(project="PJA-ASI-12C-GR2", dir=os.path.abspath("."))
 
         # Log metrics in wandb
         wandb.log(
@@ -105,6 +158,16 @@ def evaluate_model(
 
 
 def release_model(catalog: DataCatalog, evaluation_results: dict, classifier):
+    """Saves evaluation results and the model to the Kedro DataCatalog.
+
+    Args:
+        catalog: The Kedro DataCatalog instance.
+        evaluation_results: A dictionary containing evaluation metrics.
+        classifier: The trained model pipeline.
+
+    Raises:
+        IOError: If an error occurs while saving the data.
+    """
     logger = create_error_logger()
     try:
         catalog.save("evaluation_results", evaluation_results)

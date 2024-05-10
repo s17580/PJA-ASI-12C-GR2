@@ -211,3 +211,4 @@ cython_debug/
 session_store.db
 Pipe
 stats.json
+wandb

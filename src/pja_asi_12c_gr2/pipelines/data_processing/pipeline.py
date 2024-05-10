@@ -4,29 +4,41 @@ from .nodes import prepare_pokemons, preprocess_pokemons, split_data
 
 
 def create_pipeline(**kwargs) -> Pipeline:
-    """
-    Creates the Pokemon data processing and splitting pipeline.
+    """Creates a Kedro pipeline for Pokemon data processing and splitting.
+
+    This pipeline performs the following steps:
+
+    1. prepare_pokemons: Cleans and prepares the raw Pokemon data.
+    2. preprocess_pokemons:  Preprocesses the data for machine learning by
+                            scaling numerical features and one-hot encoding
+                            categorical features.
+    3. split_data: Splits the preprocessed data into training, validation, and
+                   testing sets.
+
+    Args:
+        **kwargs: Additional keyword arguments that can be passed to Kedro nodes.
 
     Returns:
-        Pipeline: A Kedro pipeline for preprocessing and splitting the Pokemon dataset.
+        Pipeline: A Kedro Pipeline object defining the entire data processing
+                  and splitting workflow.
     """
     return pipeline(
         [
             node(
                 func=prepare_pokemons,
                 inputs="pokemons",
-                outputs=["prepared_pokemons"],
+                outputs=["prepared_pokemons", "prepared_pokemons_columns"],
                 name="prepare_pokemons",
             ),
             node(
                 func=preprocess_pokemons,
                 inputs="prepared_pokemons",
-                outputs=["preprocessor"],
+                outputs=["preprocessed_pokemons", "preprocessor"],
                 name="preprocess_pokemons",
             ),
             node(
                 func=split_data,
-                inputs=["prepared_pokemons", "params:split_data"],
+                inputs=["preprocessed_pokemons", "params:split_data"],
                 outputs=["x_train", "x_val", "x_test", "y_train", "y_val", "y_test"],
                 name="split_data",
             ),
