@@ -1,6 +1,6 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import prepare_pokemons
+from .nodes import preprocess_pokemons
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -8,7 +8,9 @@ def create_pipeline(**kwargs) -> Pipeline:
 
     This pipeline performs the following step:
 
-    1. prepare_pokemons: Cleans and prepares the raw Pokemon data.
+    1. preprocess_pokemons:  Preprocesses the data for machine learning by
+                            scaling numerical features and one-hot encoding
+                            categorical features.
 
     Args:
         **kwargs: Additional keyword arguments that can be passed to Kedro nodes.
@@ -20,10 +22,10 @@ def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
             node(
-                func=prepare_pokemons,
-                inputs="pokemons",
-                outputs=["prepared_pokemons", "prepared_pokemons_columns"],
-                name="prepare_pokemons",
+                func=preprocess_pokemons,
+                inputs="prepared_pokemons",
+                outputs=["preprocessed_pokemons", "preprocessor"],
+                name="preprocess_pokemons",
             ),
         ]
     )

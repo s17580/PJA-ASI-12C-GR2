@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from pja_asi_12c_gr2.pipelines.data_science.nodes import split_data
+from pja_asi_12c_gr2.pipelines.machine_learning_and_evaluation.nodes import split_data
 
 
 @pytest.fixture
