@@ -1,14 +1,15 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import prepare_pokemons
+from .nodes import split_data
 
 
 def create_pipeline(**kwargs) -> Pipeline:
-    """Creates a Kedro pipeline for Pokemon data processing.
+    """Creates a Kedro pipeline for Pokemon data processing and splitting.
 
     This pipeline performs the following step:
 
-    1. prepare_pokemons: Cleans and prepares the raw Pokemon data.
+    1. split_data: Splits the preprocessed data into training, validation, and
+                   testing sets.
 
     Args:
         **kwargs: Additional keyword arguments that can be passed to Kedro nodes.
@@ -20,10 +21,10 @@ def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
             node(
-                func=prepare_pokemons,
-                inputs="pokemons",
-                outputs=["prepared_pokemons", "prepared_pokemons_columns"],
-                name="prepare_pokemons",
+                func=split_data,
+                inputs=["preprocessed_pokemons", "params:split_data"],
+                outputs=["x_train", "x_val", "x_test", "y_train", "y_val", "y_test"],
+                name="split_data",
             ),
         ]
     )

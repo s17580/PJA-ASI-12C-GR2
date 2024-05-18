@@ -138,7 +138,8 @@ def evaluate_model(
         f1 = f1_score(y_test, y_pred, average="weighted")
 
         # Initialize wandb session
-        os.chdir("C:")
+        # os.chdir("C:")
+        os.chdir(os.path.abspath("."))
         wandb.init(project="PJA-ASI-12C-GR2", dir=os.path.abspath("."))
 
         # Log metrics in wandb
