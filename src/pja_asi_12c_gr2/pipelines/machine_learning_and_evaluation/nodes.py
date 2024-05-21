@@ -1,3 +1,4 @@
+from ast import Param
 from typing import Dict, Any
 import os
 import logging
@@ -131,7 +132,7 @@ def evaluate_model(
     logger = create_error_logger()
     try:
         y_pred = classifier.predict(x_test)
-
+        y_probas = classifier.predict_proba(x_test) if hasattr(classifier.named_steps['classifier'], "predict_proba") else None
         accuracy = accuracy_score(y_test, y_pred)
         precision = precision_score(y_test, y_pred, average="weighted")
         recall = recall_score(y_test, y_pred, average="weighted")
@@ -146,6 +147,34 @@ def evaluate_model(
         wandb.log(
             {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
         )
+        
+        # classifier = DecisionTreeClassifier()
+        # classifier = SVC()
+        classifier = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=0)
+        classifier = RandomForestClassifier(n_estimators=50, max_depth=5, random_state=0)
+        classifier = RandomForestClassifier(n_estimators=75, max_depth=5, random_state=0)
+        # classifier = GradientBoostingClassifier()
+
+        table = wandb.Table(data = x_test, columns = x_test.columns)
+        wandb.log({"X_test" : table})
+
+        # wandb.sklearn.plot_classifier(evaluate_model,x_test,y_test,y_pred,classifier,
+        #                               is_binary = True,
+        #                               model_name = 'RandomForest')
+       
+
+        # log artifacts
+        raw_data = wandb.Artifact('raw_data', type='dataset')
+        raw_data.add_dir('data/01_raw')
+        wandb.log_artifact(raw_data)
+
+        # training_dataset = wandb.Artifact('training_dataset', type='dataset')
+        # training_dataset.add_file('data/02_itermediate/prepared_pokemons.csv')
+        # wandb.log_artifact(training_dataset)
+
+        # model_artifact = wandb.Artifact('model', type='model')
+        # model_artifact.add_file('data/05_model_output/release_model.pk/2024-05-21T00.06.12.507Z/release_model.pk')
+        # wandb.log_artifact(model_artifact)
 
         return {
             "accuracy": accuracy,
