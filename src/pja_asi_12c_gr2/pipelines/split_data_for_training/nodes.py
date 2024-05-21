@@ -1,10 +1,7 @@
 import logging
 from typing import Tuple, Dict
 from sklearn.model_selection import train_test_split
-# from sklearn.compose import ColumnTransformer
-# from sklearn.preprocessing import StandardScaler, OneHotEncoder
 import pandas as pd
-
 
 def create_error_logger() -> logging.Logger:
     """

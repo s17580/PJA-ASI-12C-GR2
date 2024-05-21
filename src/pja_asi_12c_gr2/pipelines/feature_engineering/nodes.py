@@ -1,10 +1,8 @@
 import logging
 from typing import Tuple, Dict
-# from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 import pandas as pd
-
 
 def create_error_logger() -> logging.Logger:
     """
@@ -16,8 +14,6 @@ def create_error_logger() -> logging.Logger:
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.ERROR)
     return logger
-
-
 
 def preprocess_pokemons(
     prepared_pokemons: pd.DataFrame,
