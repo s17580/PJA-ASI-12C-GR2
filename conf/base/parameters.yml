@@ -26,3 +26,17 @@ machine_learning:
     learning_rate: 0.1
     max_depth: 3
     random_state: 0
+
+method: grid
+metric:
+  name: accuracy
+  goal: maximize
+parameters:
+  classifier:
+    values: ["DecisionTreeClassifier", "SVC", "RandomForestClassifier", "GradientBoostingClassifier"]
+  n_estimators:
+    values: [50, 75, 100]
+  max_depth:
+    values: [5, 10, None]
+  random_state:
+    value: 0
