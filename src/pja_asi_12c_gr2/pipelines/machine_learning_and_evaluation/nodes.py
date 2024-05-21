@@ -3,54 +3,32 @@ from typing import Dict, Any
 import pandas as pd
 from autogluon.tabular import TabularPredictor
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from kedro.io import DataCatalog
+from kedro.framework.context import KedroContext
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.pipeline import Pipeline
+
 
 def create_error_logger() -> logging.Logger:
-    """
-    Creates and configures a logger for error handling.
-
-    Returns:
-        logging.Logger: A configured logger object set to log errors.
-    """
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.ERROR)
     return logger
 
+
 def make_column_names_unique(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Ensures unique column names in a DataFrame by appending suffixes to duplicates.
-
-    Args:
-        df: DataFrame with potential duplicate column names.
-
-    Returns:
-        DataFrame with unique column names.
-    """
     cols = pd.Series(df.columns)
     for dup in cols[cols.duplicated()].unique():
         cols[cols[cols == dup].index.values.tolist()] = [dup + '_' + str(i) if i != 0 else dup for i in range(sum(cols == dup))]
     df.columns = cols
     return df
 
+
 def autogluon_train(
     train_data: pd.DataFrame, 
     val_data: pd.DataFrame, 
     params: Dict[str, Any]
 ) -> TabularPredictor:
-    """
-    Trains an AutoML model using AutoGluon.
-
-    Args:
-        train_data: Training data with the target column.
-        val_data: Validation data with the target column.
-        params: Dictionary of parameters for AutoGluon.
-
-    Returns:
-        predictor: The trained AutoGluon predictor.
-    """
     logger = create_error_logger()
     try:
-        # Ensure unique column names
         train_data = make_column_names_unique(train_data)
         val_data = make_column_names_unique(val_data)
 
@@ -64,24 +42,16 @@ def autogluon_train(
         logger.error(f"Error during AutoGluon training: {e}")
         raise
 
+
 def preprocess_test_data(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Preprocess the test data to match the training data format.
-
-    Args:
-        df: Test DataFrame.
-
-    Returns:
-        Preprocessed test DataFrame.
-    """
     if 'Legendary' in df.columns:
         df['Legendary_1'] = df['Legendary'].astype(int)
-    df = make_column_names_unique(df)  # Ensure unique column names
+    df = make_column_names_unique(df)
 
-    # Ensure the test data has the same preprocessing steps
     if 'Legendary_1_1' not in df.columns:
         df['Legendary_1_1'] = df['Legendary_1']
     return df
+
 
 def train_model(
     x_train: pd.DataFrame,
@@ -92,21 +62,6 @@ def train_model(
     params: Dict[str, Any],
     autoML: bool = False
 ) -> Any:
-    """
-    Trains a machine learning model using the specified method.
-
-    Args:
-        x_train: The training features.
-        x_val: The validation features.
-        y_train: The training labels.
-        y_val: The validation labels.
-        preprocessor: The preprocessor for feature engineering.
-        params: A dictionary of parameters for the classifier.
-        autoML: Flag to use AutoML (AutoGluon) or standard ML.
-
-    Returns:
-        The trained model (Pipeline or TabularPredictor).
-    """
     logger = create_error_logger()
     try:
         if autoML:
@@ -114,12 +69,15 @@ def train_model(
             val_data = pd.concat([x_val, y_val.rename('Legendary')], axis=1)
             train_data = train_data.rename(columns={'Legendary': 'Legendary_1'})
             val_data = val_data.rename(columns={'Legendary': 'Legendary_1'})
-            params['target_column'] = 'Legendary_1'  # Set target column
+            params['target_column'] = 'Legendary_1'
             predictor = autogluon_train(train_data, val_data, params)
             return predictor
         else:
-            from sklearn.pipeline import Pipeline
-            classifier = get_classifier(params["classifier_type"], params)
+            classifier = DecisionTreeClassifier(
+                max_depth=params["max_depth"], 
+                min_samples_split=params["min_samples_split"], 
+                random_state=params["random_state"]
+            )
             clf = Pipeline([("preprocessor", preprocessor), ("classifier", classifier)])
             clf.fit(x_train, y_train)
             return clf
@@ -127,30 +85,17 @@ def train_model(
         logger.error(f"Failed to train model: {e}")
         raise
 
+
 def evaluate_model(
     x_test: pd.DataFrame, y_test: pd.Series, model: Any, autoML: bool = False
 ) -> Dict[str, Any]:
-    """
-    Evaluates a trained model on test data.
-
-    Args:
-        x_test: The test features.
-        y_test: The test labels.
-        model: The trained model (Pipeline or TabularPredictor).
-        autoML: Flag to use AutoML (AutoGluon) or standard ML.
-
-    Returns:
-        Dict[str, Any]: A dictionary containing evaluation metrics.
-    """
     logger = create_error_logger()
     try:
         if autoML:
             x_test = preprocess_test_data(x_test)
             y_pred = model.predict(x_test)
-            y_probas = model.predict_proba(x_test)
         else:
             y_pred = model.predict(x_test)
-            y_probas = model.predict_proba(x_test) if hasattr(model.named_steps['classifier'], "predict_proba") else None
 
         accuracy = accuracy_score(y_test, y_pred)
         precision = precision_score(y_test, y_pred, average="weighted")
@@ -167,21 +112,36 @@ def evaluate_model(
         logger.error(f"Model evaluation error: {e}")
         raise
 
+
+def champion_vs_challenger(
+    x_train: pd.DataFrame, x_val: pd.DataFrame, x_test: pd.DataFrame,
+    y_train: pd.Series, y_val: pd.Series, y_test: pd.Series,
+    preprocessor: Any, params: Dict[str, Any]
+) -> Any:
+    # Train with auto-gluon
+    autoML_params = params.copy()
+    autoML_params['autoML'] = True
+    autoML_model = train_model(x_train, x_val, y_train, y_val, preprocessor, autoML_params, autoML=True)
+    autoML_results = evaluate_model(x_test, y_test, autoML_model, autoML=True)
+
+    # Train without auto-gluon
+    regular_params = params.copy()
+    regular_params['autoML'] = False
+    regular_model = train_model(x_train, x_val, y_train, y_val, preprocessor, regular_params, autoML=False)
+    regular_results = evaluate_model(x_test, y_test, regular_model, autoML=False)
+
+    # Compare
+    if autoML_results['f1'] > regular_results['f1']:
+        return autoML_model
+    else:
+        return regular_model
+
+
 def release_model(evaluation_results: dict, classifier):
-    """
-    Saves evaluation results and the model to the Kedro DataCatalog.
-
-    Args:
-        evaluation_results: A dictionary containing evaluation metrics.
-        classifier: The trained model.
-
-    Raises:
-        IOError: If an error occurs while saving the data.
-    """
     logger = create_error_logger()
     try:
-        context = KedroContext()  # Obtain the context
-        catalog = context.catalog  # Get the catalog from context
+        context = KedroContext()
+        catalog = context.catalog
         catalog.save("evaluation_results", evaluation_results)
         catalog.save("classifier", classifier)
     except IOError as e:
