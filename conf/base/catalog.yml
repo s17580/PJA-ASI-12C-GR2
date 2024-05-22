@@ -24,6 +24,8 @@ prepared_pokemons_columns:
   type: tracking.JSONDataset
   filepath: data/06_tracking/prepared_pokemons_columns.json
 
-# metrics:
-#   type: tracking.MetricsDataset
-#   filepath: data/06_tracking/metrics.json
+evaluation_results:
+  type: kedro_datasets.tracking.JSONDataset
+  filepath: data/08_reporting/evaluation_results.json
+  save_args:
+    indent: 2

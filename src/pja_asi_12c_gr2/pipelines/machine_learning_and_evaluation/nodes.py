@@ -1,180 +1,106 @@
-from ast import Param
-from typing import Dict, Any
-import os
 import logging
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.base import ClassifierMixin
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.svm import SVC
-from sklearn.metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    confusion_matrix,
-)
-from kedro.io import DataCatalog
+from typing import Dict, Any
 import pandas as pd
-import wandb
+from autogluon.tabular import TabularPredictor
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from kedro.framework.context import KedroContext
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.pipeline import Pipeline
 
 
 def create_error_logger() -> logging.Logger:
-    """
-    Creates and configures a logger for error handling.
-
-    Returns:
-        logging.Logger: A configured logger object set to log errors.
-    """
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.ERROR)
     return logger
 
 
-def get_classifier(classifier_type: str, params: Dict[str, Any]) -> ClassifierMixin:
-    """
-    Gets an instance of a classifier based on the provided type and parameters.
+def make_column_names_unique(df: pd.DataFrame) -> pd.DataFrame:
+    cols = pd.Series(df.columns)
+    for dup in cols[cols.duplicated()].unique():
+        cols[cols[cols == dup].index.values.tolist()] = [dup + '_' + str(i) if i != 0 else dup for i in range(sum(cols == dup))]
+    df.columns = cols
+    return df
 
-    Args:
-        classifier_type: String specifying the type of classifier ("DecisionTreeClassifier", "RandomForestClassifier", "SVC", or "GradientBoostingClassifier").
-        params: A dictionary containing parameters to initialize the classifier.
 
-    Returns:
-        ClassifierMixin: An instance of the specified classifier.
-
-    Raises:
-        ValueError: If an unsupported classifier type is provided.
-        TypeError: If there's a type mismatch in the provided parameters.
-    """
-    classifiers = {
-        "DecisionTreeClassifier": DecisionTreeClassifier,
-        "RandomForestClassifier": RandomForestClassifier,
-        "SVC": SVC,
-        "GradientBoostingClassifier": GradientBoostingClassifier,
-    }
-    if classifier_type not in classifiers:
-        raise ValueError(f"Unsupported classifier type: {classifier_type}")
-
-    # None handling and types conversion
+def autogluon_train(
+    train_data: pd.DataFrame, 
+    val_data: pd.DataFrame, 
+    params: Dict[str, Any]
+) -> TabularPredictor:
     logger = create_error_logger()
-    for key, value in list(params.items()):
-        if isinstance(value, str):
-            if value == "None":
-                params[key] = None
-            elif value.isdigit():
-                params[key] = int(value)
     try:
-        params = {
-            key: value for key, value in params.items() if key != "classifier_type"
-        }
-        return classifiers[classifier_type](**params)
-    except TypeError as e:
-        logger.error(f"Type conversion error for classifier parameters: {e}")
+        train_data = make_column_names_unique(train_data)
+        val_data = make_column_names_unique(val_data)
+
+        predictor = TabularPredictor(label=params['target_column']).fit(
+            train_data, 
+            tuning_data=val_data, 
+            presets=params.get('presets', 'medium_quality_faster_train')
+        )
+        return predictor
+    except Exception as e:
+        logger.error(f"Error during AutoGluon training: {e}")
         raise
 
 
-def machine_learning(
+def preprocess_test_data(df: pd.DataFrame) -> pd.DataFrame:
+    if 'Legendary' in df.columns:
+        df['Legendary_1'] = df['Legendary'].astype(int)
+    df = make_column_names_unique(df)
+
+    if 'Legendary_1_1' not in df.columns:
+        df['Legendary_1_1'] = df['Legendary_1']
+    return df
+
+
+def train_model(
     x_train: pd.DataFrame,
     x_val: pd.DataFrame,
     y_train: pd.Series,
     y_val: pd.Series,
-    preprocessor: ColumnTransformer,
+    preprocessor: Any,
     params: Dict[str, Any],
-) -> Pipeline:
-    """
-    Creates and trains a machine learning pipeline.
-
-    Args:
-        x_train: The training features.
-        x_val: The validation features.
-        y_train: The training labels.
-        y_val: The validation labels.
-        preprocessor: The preprocessor for feature engineering.
-        params: A dictionary of parameters for the classifier.
-
-    Returns:
-        Pipeline: The trained pipeline.
-
-    Raises:
-        Exception: If training fails.
-    """
+    autoML: bool = False
+) -> Any:
     logger = create_error_logger()
     try:
-        classifier = get_classifier(params["classifier_type"], params)
-        clf = Pipeline([("preprocessor", preprocessor), ("classifier", classifier)])
-        clf.fit(x_train, y_train)
-        return clf
+        if autoML:
+            train_data = pd.concat([x_train, y_train.rename('Legendary')], axis=1)
+            val_data = pd.concat([x_val, y_val.rename('Legendary')], axis=1)
+            train_data = train_data.rename(columns={'Legendary': 'Legendary_1'})
+            val_data = val_data.rename(columns={'Legendary': 'Legendary_1'})
+            params['target_column'] = 'Legendary_1'
+            predictor = autogluon_train(train_data, val_data, params)
+            return predictor
+        else:
+            classifier = DecisionTreeClassifier(
+                max_depth=params["max_depth"], 
+                min_samples_split=params["min_samples_split"], 
+                random_state=params["random_state"]
+            )
+            clf = Pipeline([("preprocessor", preprocessor), ("classifier", classifier)])
+            clf.fit(x_train, y_train)
+            return clf
     except Exception as e:
-        logger.error(f"Failed to train classifier: {e}")
+        logger.error(f"Failed to train model: {e}")
         raise
 
 
 def evaluate_model(
-    x_test: pd.DataFrame, y_test: pd.Series, classifier: Pipeline
+    x_test: pd.DataFrame, y_test: pd.Series, model: Any, autoML: bool = False
 ) -> Dict[str, Any]:
-    """
-    Evaluates a trained model on test data and logs metrics using wandb.
-
-    Args:
-        x_test: The test features.
-        y_test: The test labels.
-        classifier: The trained pipeline.
-
-    Returns:
-        Dict[str, Any]: A dictionary containing evaluation metrics.
-
-    Raises:
-        ValueError: If an error occurs during evaluation.
-        KeyError: If metric logging fails.
-        OSError: If wandb initialization fails.
-    """
     logger = create_error_logger()
     try:
-        y_pred = classifier.predict(x_test)
-        y_probas = classifier.predict_proba(x_test) if hasattr(classifier.named_steps['classifier'], "predict_proba") else None
+        if autoML:
+            x_test = preprocess_test_data(x_test)
+            y_pred = model.predict(x_test)
+        else:
+            y_pred = model.predict(x_test)
+
         accuracy = accuracy_score(y_test, y_pred)
         precision = precision_score(y_test, y_pred, average="weighted")
         recall = recall_score(y_test, y_pred, average="weighted")
         f1 = f1_score(y_test, y_pred, average="weighted")
-
-        # Initialize wandb session
-        # os.chdir("C:")
-        os.chdir(os.path.abspath("."))
-        wandb.init(project="PJA-ASI-12C-GR2", dir=os.path.abspath("."))
-
-        # Log metrics in wandb
-        wandb.log(
-            {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
-        )
-        
-        # classifier = DecisionTreeClassifier()
-        # classifier = SVC()
-        classifier = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=0)
-        classifier = RandomForestClassifier(n_estimators=50, max_depth=5, random_state=0)
-        classifier = RandomForestClassifier(n_estimators=75, max_depth=5, random_state=0)
-        # classifier = GradientBoostingClassifier()
-
-        table = wandb.Table(data = x_test, columns = x_test.columns)
-        wandb.log({"X_test" : table})
-
-        # wandb.sklearn.plot_classifier(evaluate_model,x_test,y_test,y_pred,classifier,
-        #                               is_binary = True,
-        #                               model_name = 'RandomForest')
-       
-
-        # log artifacts
-        raw_data = wandb.Artifact('raw_data', type='dataset')
-        raw_data.add_dir('data/01_raw')
-        wandb.log_artifact(raw_data)
-
-        # training_dataset = wandb.Artifact('training_dataset', type='dataset')
-        # training_dataset.add_file('data/02_itermediate/prepared_pokemons.csv')
-        # wandb.log_artifact(training_dataset)
-
-        # model_artifact = wandb.Artifact('model', type='model')
-        # model_artifact.add_file('data/05_model_output/release_model.pk/2024-05-21T00.06.12.507Z/release_model.pk')
-        # wandb.log_artifact(model_artifact)
 
         return {
             "accuracy": accuracy,
@@ -187,20 +113,37 @@ def evaluate_model(
         raise
 
 
-def release_model(catalog: DataCatalog, evaluation_results: dict, classifier):
-    """Saves evaluation results and the model to the Kedro DataCatalog.
+def champion_vs_challenger(
+    x_train: pd.DataFrame, x_val: pd.DataFrame, x_test: pd.DataFrame,
+    y_train: pd.Series, y_val: pd.Series, y_test: pd.Series,
+    preprocessor: Any, params: Dict[str, Any]
+) -> Any:
+    # Train with auto-gluon
+    autoML_params = params.copy()
+    autoML_params['autoML'] = True
+    autoML_model = train_model(x_train, x_val, y_train, y_val, preprocessor, autoML_params, autoML=True)
+    autoML_results = evaluate_model(x_test, y_test, autoML_model, autoML=True)
 
-    Args:
-        catalog: The Kedro DataCatalog instance.
-        evaluation_results: A dictionary containing evaluation metrics.
-        classifier: The trained model pipeline.
+    # Train without auto-gluon
+    regular_params = params.copy()
+    regular_params['autoML'] = False
+    regular_model = train_model(x_train, x_val, y_train, y_val, preprocessor, regular_params, autoML=False)
+    regular_results = evaluate_model(x_test, y_test, regular_model, autoML=False)
 
-    Raises:
-        IOError: If an error occurs while saving the data.
-    """
+    # Compare
+    if autoML_results['f1'] > regular_results['f1']:
+        return autoML_model
+    else:
+        return regular_model
+
+
+def release_model(evaluation_results: dict, classifier):
     logger = create_error_logger()
     try:
+        context = KedroContext()
+        catalog = context.catalog
         catalog.save("evaluation_results", evaluation_results)
+        catalog.save("classifier", classifier)
     except IOError as e:
         logger.error(f"IOError: {e}")
         raise

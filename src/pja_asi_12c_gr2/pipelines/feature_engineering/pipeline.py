@@ -1,7 +1,5 @@
 from kedro.pipeline import Pipeline, node, pipeline
-
 from .nodes import preprocess_pokemons
-
 
 def create_pipeline(**kwargs) -> Pipeline:
     """Creates a Kedro pipeline for Pokemon data processing.
