@@ -10,8 +10,7 @@ from kedro.framework.hooks import _create_hooks_manager
 from kedro.framework.session import KedroSession
 from kedro.io import DataCatalog
 from pja_asi_12c_gr2.pipelines.data_processing.nodes import prepare_pokemons
-from pja_asi_12c_gr2.pipelines.split_data_for_training.nodes import split_data
-from pja_asi_12c_gr2.pipelines.machine_learning_and_evaluation.nodes import train_model, evaluate_model, release_model
+from pja_asi_12c_gr2.pipelines.data_science import split_data,rain_model, evaluate_model, release_model
 import wandb
 
 def _find_run_command(package_name):
