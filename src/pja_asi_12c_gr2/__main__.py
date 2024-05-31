@@ -10,7 +10,8 @@ from kedro.framework.hooks import _create_hooks_manager
 from kedro.framework.session import KedroSession
 from kedro.io import DataCatalog
 from pja_asi_12c_gr2.pipelines.data_processing.nodes import prepare_pokemons
-from pja_asi_12c_gr2.pipelines.data_science import split_data,rain_model, evaluate_model, release_model
+from pja_asi_12c_gr2.pipelines.data_science import split_data, train_model, evaluate_model
+from pja_asi_12c_gr2.pipelines.deployment.nodes import select_best_model, release_model
 import wandb
 
 def _find_run_command(package_name):
@@ -44,11 +45,15 @@ if __name__ == "__main__":
     with KedroSession.create(package_name="pja_asi_12c_gr2") as session:
         context = session.load_context()
         catalog = context.catalog
-        # Run the pipeline
-        main()
+        params = context.params
+
+        if params.get("select_best_model", False):
+            # Run the pipeline including the select_best_model node
+            main(pipeline_name="__default__")
+        else:
+            # Run only the data_science pipeline
+            main(pipeline_name="data_science")
+
         # After running the pipeline, release the model
-        release_model(
-            evaluation_results=catalog.load("evaluation_results"),
-            classifier=catalog.load("classifier"),
-            catalog=catalog
-        )
+        classifier = catalog.load("classifier")
+        release_model(classifier)

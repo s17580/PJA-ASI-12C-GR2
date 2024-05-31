@@ -1,4 +1,5 @@
 autoML: true
+select_best_model: false
 
 split_data:
   test_size: 0.2
@@ -42,6 +43,5 @@ parameters:
     values: [5, 10, None]
   random_state:
     value: 0
-
 
 target_column: "Legendary"

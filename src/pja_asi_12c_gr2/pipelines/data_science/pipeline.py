@@ -3,7 +3,6 @@ from .nodes import (
     split_data,
     train_model,
     evaluate_model,
-    release_model,
 )
 
 def create_pipeline(**kwargs):
@@ -22,7 +21,6 @@ def create_pipeline(**kwargs):
                     "x_val",
                     "y_train",
                     "y_val",
-                    "preprocessor",
                     "params:machine_learning.decision_tree",
                     "params:autoML",
                 ],
@@ -39,12 +37,6 @@ def create_pipeline(**kwargs):
                 ],
                 outputs="evaluation_results",
                 name="evaluate_model_node",
-            ),
-            node(
-                func=release_model,
-                inputs=["evaluation_results", "classifier"],
-                outputs=None,
-                name="release_model_node",
             ),
         ]
     )

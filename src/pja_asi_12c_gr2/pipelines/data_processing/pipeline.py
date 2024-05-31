@@ -24,13 +24,13 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=prepare_pokemons,
                 inputs="pokemons",
-                outputs=["prepared_pokemons", "prepared_pokemons_columns"],
+                outputs=["prepared_pokemons"],
                 name="prepare_pokemons",
             ),
             node(
                 func=preprocess_pokemons,
                 inputs="prepared_pokemons",
-                outputs=["preprocessed_pokemons", "preprocessor"],
+                outputs=["preprocessed_pokemons"],
                 name="preprocess_pokemons",
             ),
         ]
