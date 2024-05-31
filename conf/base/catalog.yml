@@ -30,4 +30,10 @@ evaluation_results:
   save_args:
     indent: 2
 
+metadata:
+  type: kedro_datasets.tracking.JSONDataset
+  filepath: data/06_tracking/metadata.json
+  save_args:
+    indent: 2
+
 
