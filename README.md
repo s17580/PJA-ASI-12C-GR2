@@ -68,3 +68,7 @@ Procedura wspierana dla następujących wersji oprogramowania:
 **3.** Uruchom konsolę **Anaconda Powershell** i przejdź lokalizacji, w której znajdują się pobrane pliki.  
 **4.** Uruchomić skrypt *`import-conda-environment.ps1`*.  
 **5.** Po poprawnym imporcie środowiska, w konsoli powinien pojawić się komunikat: *"Environment PJA-ASI-12C-GR2 successfully created and activated."*.  
+
+### Uruchomienie projektu z Dockera
+
+`docker run s23020/pja-asi-12c-gr2:v1`
