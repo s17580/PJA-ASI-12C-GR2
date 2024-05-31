@@ -21,7 +21,6 @@ def create_pipeline(**kwargs):
                     "x_val",
                     "y_train",
                     "y_val",
-                    "preprocessor",
                     "params:machine_learning.decision_tree",
                     "params:autoML",
                 ],
