@@ -45,3 +45,5 @@ parameters:
     value: 0
 
 target_column: "Legendary"
+synthetic_data:
+  num_samples: 1000
