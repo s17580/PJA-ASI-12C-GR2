@@ -20,20 +20,14 @@ release_model:
   filepath: data/05_model_output/release_model.pk
   versioned: true
 
-prepared_pokemons_columns:
-  type: tracking.JSONDataset
-  filepath: data/06_tracking/prepared_pokemons_columns.json
-
-evaluation_results:
-  type: kedro_datasets.tracking.JSONDataset
-  filepath: data/08_reporting/evaluation_results.json
-  save_args:
-    indent: 2
-
 metadata:
   type: kedro_datasets.tracking.JSONDataset
   filepath: data/06_tracking/metadata.json
   save_args:
     indent: 2
 
-
+evaluation_results:
+  type: kedro_datasets.tracking.JSONDataset
+  filepath: data/07_reporting/evaluation_results.json
+  save_args:
+    indent: 2

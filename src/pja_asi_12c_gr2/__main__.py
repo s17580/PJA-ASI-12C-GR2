@@ -10,9 +10,14 @@ from kedro.framework.hooks import _create_hooks_manager
 from kedro.framework.session import KedroSession
 from kedro.io import DataCatalog
 from pja_asi_12c_gr2.pipelines.data_processing.nodes import prepare_pokemons
-from pja_asi_12c_gr2.pipelines.data_science import split_data, train_model, evaluate_model
+from pja_asi_12c_gr2.pipelines.data_science.nodes import (
+    split_data,
+    train_model,
+    evaluate_model,
+)
 from pja_asi_12c_gr2.pipelines.deployment.nodes import select_best_model, release_model
 import wandb
+
 
 def _find_run_command(package_name):
     try:
@@ -25,21 +30,25 @@ def _find_run_command(package_name):
         if run:
             return run
         from kedro.framework.cli.project import run
+
         return run
     if not hasattr(project_cli, "cli"):
         raise KedroCliError(f"Cannot load commands from {package_name}.cli")
     return project_cli.run
+
 
 def _find_run_command_in_plugins(plugins):
     for group in plugins:
         if "run" in group.commands:
             return group.commands["run"]
 
+
 def main(*args, **kwargs):
     package_name = Path(__file__).parent.name
     configure_project(package_name)
     run = _find_run_command(package_name)
     run(*args, **kwargs)
+
 
 if __name__ == "__main__":
     with KedroSession.create(package_name="pja_asi_12c_gr2") as session:

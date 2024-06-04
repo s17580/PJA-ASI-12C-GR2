@@ -212,3 +212,4 @@ session_store.db
 Pipe
 stats.json
 wandb
+AutogluonModels

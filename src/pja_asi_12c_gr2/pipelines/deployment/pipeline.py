@@ -14,6 +14,7 @@ def create_pipeline(**kwargs):
                     "y_train",
                     "y_val",
                     "y_test",
+                    "preprocessor",
                     "params:machine_learning",
                 ],
                 outputs="best_model",

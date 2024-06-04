@@ -12,6 +12,7 @@ def select_best_model(
     y_train: pd.Series,
     y_val: pd.Series,
     y_test: pd.Series,
+    preprocessor: Any,
     params: Dict[str, Any],
 ) -> Any:
     logger = create_error_logger()
@@ -21,7 +22,7 @@ def select_best_model(
         autoML_params = params.copy()
         autoML_params["autoML"] = True
         autoML_model = train_model(
-            x_train, x_val, y_train, y_val, autoML_params, autoML=True
+            x_train, x_val, y_train, y_val, preprocessor, autoML_params, autoML=True
         )
         autoML_results = evaluate_model(x_test, y_test, autoML_model, autoML=True)
 
@@ -29,7 +30,7 @@ def select_best_model(
         regular_params = params.copy()
         regular_params["autoML"] = False
         regular_model = train_model(
-            x_train, x_val, y_train, y_val, regular_params, autoML=False
+            x_train, x_val, y_train, y_val, preprocessor, regular_params, autoML=False
         )
         regular_results = evaluate_model(x_test, y_test, regular_model, autoML=False)
 
