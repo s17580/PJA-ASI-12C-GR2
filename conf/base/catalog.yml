@@ -21,13 +21,13 @@ release_model:
   versioned: true
 
 metadata:
-  type: kedro_datasets.tracking.JSONDataset
+  type: tracking.JSONDataset
   filepath: data/06_tracking/metadata.json
-  save_args:
-    indent: 2
 
 evaluation_results:
   type: kedro_datasets.tracking.JSONDataset
   filepath: data/07_reporting/evaluation_results.json
   save_args:
     indent: 2
+
+

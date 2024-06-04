@@ -7,11 +7,12 @@ from kedro.framework.context import KedroContext
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
-
-# from sdv.tabular import CTGAN
+from ctgan import CTGAN
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
+
+# from sdv.tabular import CTGAN
 
 
 def create_error_logger() -> logging.Logger:
@@ -147,7 +148,6 @@ def evaluate_model(
         raise
 
 
-'''
 def generate_synthetic_data(real_data: pd.DataFrame, num_samples: int) -> pd.DataFrame:
     """
     Generates synthetic data using the CTGAN model from SDV.
@@ -163,7 +163,6 @@ def generate_synthetic_data(real_data: pd.DataFrame, num_samples: int) -> pd.Dat
     model.fit(real_data)
     synthetic_data = model.sample(num_samples)
     return synthetic_data
-
 
 
 def retrain_model(
@@ -222,4 +221,3 @@ def retrain_model(
     except Exception as e:
         logger.error(f"Error in retrain_model: {e}")
         raise
-    '''

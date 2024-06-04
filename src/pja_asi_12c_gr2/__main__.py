@@ -10,7 +10,7 @@ from kedro.framework.hooks import _create_hooks_manager
 from kedro.framework.session import KedroSession
 from kedro.io import DataCatalog
 from pja_asi_12c_gr2.pipelines.data_processing.nodes import prepare_pokemons
-from pja_asi_12c_gr2.pipelines.data_science.nodes import (
+from pja_asi_12c_gr2.pipelines.data_science import (
     split_data,
     train_model,
     evaluate_model,
