@@ -1,6 +1,7 @@
 from kedro.pipeline import Pipeline, node
 from .nodes import select_best_model, release_model
 
+
 def create_pipeline(**kwargs):
     return Pipeline(
         [
@@ -17,7 +18,7 @@ def create_pipeline(**kwargs):
                 ],
                 outputs="best_model",
                 name="select_best_model_node",
-                tags=["optional"]
+                tags=["optional"],
             ),
             node(
                 func=release_model,

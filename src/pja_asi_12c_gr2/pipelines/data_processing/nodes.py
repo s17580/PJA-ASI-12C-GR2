@@ -4,6 +4,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 import pandas as pd
 
+
 def create_error_logger() -> logging.Logger:
     """
     Creates a logger to record errors during pipeline execution.
@@ -14,6 +15,7 @@ def create_error_logger() -> logging.Logger:
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.ERROR)
     return logger
+
 
 def calculate_custom_feature(pokemons: pd.DataFrame) -> pd.DataFrame:
     """
@@ -26,8 +28,9 @@ def calculate_custom_feature(pokemons: pd.DataFrame) -> pd.DataFrame:
         DataFrame: Pokemon DataFrame with 'CustomFeature' column added.
     """
     # Example coefficient
-    pokemons['CustomFeature'] = pokemons['Attack'] / (pokemons['Defense'] + 1)  
+    pokemons["CustomFeature"] = pokemons["Attack"] / (pokemons["Defense"] + 1)
     return pokemons
+
 
 def prepare_pokemons(pokemons: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
     """Prepares the Pokemon DataFrame for further analysis.
@@ -68,6 +71,7 @@ def prepare_pokemons(pokemons: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
         # Catch-all for unexpected errors
         logger.error(f"Unexpected error during DataFrame preparation: {e}")
         raise
+
 
 def preprocess_pokemons(
     prepared_pokemons: pd.DataFrame,
