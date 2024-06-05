@@ -1,7 +1,5 @@
 import logging
 from typing import Tuple, Dict
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
 import pandas as pd
 
 
@@ -26,10 +24,25 @@ def calculate_custom_feature(pokemons: pd.DataFrame) -> pd.DataFrame:
 
     Returns:
         DataFrame: Pokemon DataFrame with 'CustomFeature' column added.
+
+    Raises:
+        KeyError: If 'Attack' or 'Defense' columns are not in the DataFrame.
+        Exception: For any other exceptions that occur during the calculation.
     """
-    # Example coefficient
-    pokemons["CustomFeature"] = pokemons["Attack"] / (pokemons["Defense"] + 1)
-    return pokemons
+    logger = create_error_logger()
+    try:
+        if "Attack" not in pokemons.columns or "Defense" not in pokemons.columns:
+            raise KeyError("'Attack' or 'Defense' column is missing from the DataFrame")
+
+        # Example coefficient
+        pokemons["CustomFeature"] = pokemons["Attack"] / (pokemons["Defense"] + 1)
+        return pokemons
+    except KeyError as e:
+        logger.error("KeyError in calculate_custom_feature: %s", e)
+        raise
+    except Exception as e:
+        logger.error("Error in calculate_custom_feature: %s", e)
+        raise
 
 
 def prepare_pokemons(pokemons: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
@@ -65,43 +78,8 @@ def prepare_pokemons(pokemons: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
             "data_type": "prepared_pokemons",
         }
     except KeyError as e:
-        logger.error(f"Data preparation error: Missing column '{e}'")
-        raise  # Re-raise the exception
-    except Exception as e:
-        # Catch-all for unexpected errors
-        logger.error(f"Unexpected error during DataFrame preparation: {e}")
+        logger.error("Data preparation error: Missing column '%s'", e)
         raise
-
-
-def preprocess_pokemons(
-    prepared_pokemons: pd.DataFrame,
-) -> Tuple[pd.DataFrame, ColumnTransformer]:
-    """Preprocesses the Pokemon data.
-
-    Args:
-        prepared_pokemons: A DataFrame containing the prepared Pokemon data.
-
-    Returns:
-        Tuple[pd.DataFrame, ColumnTransformer]: A tuple containing:
-            * The preprocessed DataFrame.
-            * The fitted ColumnTransformer for scaling and encoding features.
-    """
-    logger = create_error_logger()
-    try:
-        categorical_features = ["Type 1", "Type 2"]
-        numeric_features = prepared_pokemons.select_dtypes(
-            include=["int64", "float64"]
-        ).columns
-
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ("num", StandardScaler(), numeric_features),
-                ("cat", OneHotEncoder(), categorical_features),
-            ]
-        )
-        # Preprocessing
-        preprocessed_pokemons = prepared_pokemons
-        return preprocessed_pokemons, preprocessor
     except Exception as e:
-        logger.error(f"Unexpected error during preprocessing: {e}")
+        logger.error("Unexpected error during DataFrame preparation: %s", e)
         raise
