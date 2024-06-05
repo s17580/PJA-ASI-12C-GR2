@@ -69,6 +69,8 @@ Procedura wspierana dla następujących wersji oprogramowania:
 **4.** Uruchomić skrypt *`import-conda-environment.ps1`*.  
 **5.** Po poprawnym imporcie środowiska, w konsoli powinien pojawić się komunikat: *"Environment PJA-ASI-12C-GR2 successfully created and activated."*.  
 
-### Uruchomienie projektu z Dockera
+### Uruchomienie projektu w Dockerze na Windows
 
-`docker run s23020/pja-asi-12c-gr2:v1`
+**1.** Pobrać Docker Desktop z [oficjalnej strony](https://docs.docker.com/desktop/install/windows-install/) i zainstalować w systemie na domyślnych parametrach.  
+**2.** Uruchomić Docker Desktop.  
+**3.** Aby uruchomić aplikację w kontenerze należy użyć polecenia: `docker run s23020/pja-asi-12c-gr2:v1`.  

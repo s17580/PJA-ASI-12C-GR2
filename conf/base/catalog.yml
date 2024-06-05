@@ -4,36 +4,24 @@ pokemons:
 
 prepared_pokemons:
   type: pandas.CSVDataset
-  filepath: data/02_intermediate/prepared_pokemons.csv
-
-preprocessed_pokemons:
-  type: pandas.ParquetDataset
-  filepath: data/03_primary/preprocessed_pokemons.pq
+  filepath: data/02_transformed/prepared_pokemons.csv
 
 classifier:
   type: pickle.PickleDataset
-  filepath: data/04_models/pokemon_classifier.pk
+  filepath: data/03_models/pokemon_classifier.pk
   versioned: true
 
 release_model:
   type: pickle.PickleDataset
-  filepath: data/05_model_output/release_model.pk
+  filepath: data/04_model_output/release_model.pk
   versioned: true
 
-prepared_pokemons_columns:
+metadata:
   type: tracking.JSONDataset
-  filepath: data/06_tracking/prepared_pokemons_columns.json
+  filepath: data/05_tracking/metadata.json
 
 evaluation_results:
   type: kedro_datasets.tracking.JSONDataset
-  filepath: data/08_reporting/evaluation_results.json
+  filepath: data/06_reporting/evaluation_results.json
   save_args:
     indent: 2
-
-metadata:
-  type: kedro_datasets.tracking.JSONDataset
-  filepath: data/06_tracking/metadata.json
-  save_args:
-    indent: 2
-
-
