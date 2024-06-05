@@ -71,6 +71,6 @@ Procedura wspierana dla następujących wersji oprogramowania:
 
 ### Uruchomienie projektu w Dockerze na Windows
 
-**1.** Pobrać Docker Desktop z [oficjalnej strony]<https://docs.docker.com/desktop/install/windows-install/> i zainstalować w systemie na domyślnych parametrach.
-**2.** Uruchomić Docker Desktop.
-**3.** Aby uruchomić aplikację należy użyć polecenia: `docker run s23020/pja-asi-12c-gr2:v1`.
+**1.** Pobrać Docker Desktop z [oficjalnej strony](https://docs.docker.com/desktop/install/windows-install/) i zainstalować w systemie na domyślnych parametrach.  
+**2.** Uruchomić Docker Desktop.  
+**3.** Aby uruchomić aplikację należy użyć polecenia: `docker run s23020/pja-asi-12c-gr2:v1`.  
