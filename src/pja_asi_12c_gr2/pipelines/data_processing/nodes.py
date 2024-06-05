@@ -99,6 +99,7 @@ def preprocess_pokemons(
                 ("cat", OneHotEncoder(), categorical_features),
             ]
         )
+        # Preprocessing
         preprocessed_pokemons = prepared_pokemons
         return preprocessed_pokemons, preprocessor
     except Exception as e:

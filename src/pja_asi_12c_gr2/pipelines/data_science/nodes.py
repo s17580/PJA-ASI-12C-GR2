@@ -12,8 +12,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 
-# from sdv.tabular import CTGAN
-
 
 def create_error_logger() -> logging.Logger:
     logger = logging.getLogger(__name__)
