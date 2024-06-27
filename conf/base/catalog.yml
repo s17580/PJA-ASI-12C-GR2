@@ -6,6 +6,10 @@ prepared_pokemons:
   type: pandas.CSVDataset
   filepath: data/02_transformed/prepared_pokemons.csv
 
+real_data:
+  type: pandas.CSVDataset
+  filepath: data/02_intermediate/real_data.csv
+
 classifier:
   type: pickle.PickleDataset
   filepath: data/03_models/pokemon_classifier.pk

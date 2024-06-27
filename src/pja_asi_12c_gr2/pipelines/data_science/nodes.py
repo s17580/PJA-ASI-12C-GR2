@@ -327,7 +327,18 @@ def generate_synthetic_data(real_data: pd.DataFrame, num_samples: int) -> pd.Dat
     try:
         if not isinstance(num_samples, int) or num_samples <= 0:
             raise ValueError("num_samples must be a positive integer.")
-        model = CTGAN()
+        # Log the columns and first few rows of real_data for debugging
+        logger.info(f"Columns in real_data: {real_data.columns}")
+        logger.info(f"First few rows of real_data: {real_data.head()}")
+        # Ensure all columns have valid data
+        real_data = real_data.dropna()
+        
+        model = CTGAN(embedding_dim=128, 
+            generator_dim=(256, 256, 256), 
+            discriminator_dim=(256, 256, 256), 
+            batch_size=500, 
+            epochs=300)
+            # n_components=10)
         model.fit(real_data)
         synthetic_data = model.sample(num_samples)
         return synthetic_data
