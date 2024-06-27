@@ -11,6 +11,7 @@ from ctgan import CTGAN
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
+from sklearn.mixture import BayesianGaussianMixture
 
 
 def create_error_logger() -> logging.Logger:
@@ -324,30 +325,41 @@ def generate_synthetic_data(real_data: pd.DataFrame, num_samples: int) -> pd.Dat
         Exception: If there are issues with the data format or if the CTGAN model fails to fit or sample.
     """
     logger = create_error_logger()
-    try:
-        if not isinstance(num_samples, int) or num_samples <= 0:
-            raise ValueError("num_samples must be a positive integer.")
-        # Log the columns and first few rows of real_data for debugging
-        logger.info(f"Columns in real_data: {real_data.columns}")
-        logger.info(f"First few rows of real_data: {real_data.head()}")
-        # Ensure all columns have valid data
-        real_data = real_data.dropna()
-        
-        model = CTGAN(embedding_dim=128, 
-            generator_dim=(256, 256, 256), 
-            discriminator_dim=(256, 256, 256), 
-            batch_size=500, 
-            epochs=300)
-            # n_components=10)
-        model.fit(real_data)
-        synthetic_data = model.sample(num_samples)
-        return synthetic_data
-    except ValueError as ve:
-        logger.error("Value Error in generate_synthetic_data: %s", ve)
-        raise
-    except Exception as e:
-        logger.error("Unexpected error during synthetic data generation: %s", e)
-        raise
+    max_attempts = 5
+    attempt = 0
+
+    while attempt < max_attempts:
+        try:
+            logger.info(f"Attempt {attempt+1}: Generating synthetic data...")
+            # Prepare the model
+            discrete_columns = real_data.select_dtypes(include=["object"]).columns.tolist()
+            model = CTGAN(embedding_dim=128, generator_dim=(256, 256, 256), discriminator_dim=(256, 256, 256), 
+                          batch_size=500, epochs=300)
+
+            # Fit the model
+            model.fit(real_data, discrete_columns)
+
+            # Generate synthetic data
+            synthetic_data = model.sample(num_samples)
+            
+            # Ensure the synthetic data has the same columns as the real data
+            if synthetic_data.shape[1] != real_data.shape[1]:
+                logger.error(f"Shape mismatch: synthetic data has {synthetic_data.shape[1]} columns, expected {real_data.shape[1]}")
+                raise ValueError(f"Shape mismatch: synthetic data has {synthetic_data.shape[1]} columns, expected {real_data.shape[1]}")
+            
+            logger.info(f"Synthetic data columns: {synthetic_data.columns}")
+
+            # Verify if synthetic data contains more than one class in the target column
+            if synthetic_data['target'].nunique() > 1:
+                return synthetic_data
+            else:
+                logger.warning("Synthetic data contains only one class in the target column")
+                attempt += 1
+        except Exception as e:
+            logger.error("Error during synthetic data generation: %s", e)
+            attempt += 1
+
+    raise ValueError("Failed to generate synthetic data with more than one class in the target column after multiple attempts")
 
 
 def retrain_model(
@@ -380,8 +392,26 @@ def retrain_model(
     logger = create_error_logger()
 
     try:
+        # Fill NaNs in real_data
+        real_data.fillna(0, inplace=True)
+        # Fill NaNs in synthetic_data
+        synthetic_data.fillna(0, inplace=True)
         # Combine real and synthetic data
         combined_data = pd.concat([real_data, synthetic_data])
+
+        if 'target' not in combined_data.columns:
+            logger.error("The 'target' column is missing from the combined data")
+            raise KeyError("The 'target' column is missing from the combined data")
+        
+        # Check for NaNs in the target column
+        if combined_data['target'].isna().sum() > 0:
+            logger.error("The 'target' column contains NaN values")
+            raise ValueError("The 'target' column contains NaN values")
+
+        # Verify if combined data contains more than one class in the target column
+        if combined_data['target'].nunique() <= 1:
+            logger.error("Combined data contains only one class in the target column")
+            raise ValueError("Combined data contains only one class in the target column")
 
         # Split data into features and target
         X = combined_data.drop("target", axis=1)

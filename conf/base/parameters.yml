@@ -31,10 +31,10 @@ machine_learning:
     random_state: 0
     machine_learning:
   logistic_regression:
-    classifier_type: "LogisticRegression"
+    penalty: l2
+    C: 1.0
+    solver: lbfgs
     max_iter: 100
-    random_state: 0
-    solver: "lbfgs"
 
 method: grid
 metric:
