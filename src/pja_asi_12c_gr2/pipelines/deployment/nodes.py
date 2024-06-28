@@ -3,6 +3,8 @@ from typing import Dict, Any
 import pandas as pd
 from kedro.framework.context import KedroContext
 from pja_asi_12c_gr2.pipelines.data_science.nodes import train_model, evaluate_model
+import joblib
+import os
 
 
 def select_best_model(
@@ -61,10 +63,14 @@ def select_best_model(
         )
         regular_results = evaluate_model(x_test, y_test, regular_model, autoML=False)
 
-        # Compare
+        # Compare models and the best one
         if autoML_results["f1"] > regular_results["f1"]:
+            model_path = os.getenv("MODEL_PATH", "data/06_model_output/best_model.pkl")
+            joblib.dump(autoML_model, model_path)
             return autoML_model
         else:
+            model_path = os.getenv("MODEL_PATH", "data/06_model_output/best_model.pkl")
+            joblib.dump(regular_model, model_path)
             return regular_model
     except Exception as e:
         logger.error("Error in select_best_model: %s", e)

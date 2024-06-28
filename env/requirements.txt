@@ -22,6 +22,6 @@ dask==2024.5.1
 wandb==0.16.6
 sdv==1.12.1
 ctgan==0.10.1
-fastapi==0.110.1
-uvicorn==0.27.1
+fastapi==0.73.0
+uvicorn==0.22.0
 joblib==1.4.2

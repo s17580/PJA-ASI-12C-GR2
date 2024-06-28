@@ -24,7 +24,7 @@ evaluation_results:
 best_model:
   type: pickle.PickleDataset
   filepath: data/06_model_output/best_model.pk
-  versioned: true
+  versioned: no
 
 real_data:
   type: pandas.CSVDataset

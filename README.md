@@ -73,4 +73,7 @@ Procedura wspierana dla następujących wersji oprogramowania:
 
 **1.** Pobrać Docker Desktop z [oficjalnej strony](https://docs.docker.com/desktop/install/windows-install/) i zainstalować w systemie na domyślnych parametrach.  
 **2.** Uruchomić Docker Desktop.  
-**3.** Aby uruchomić aplikację w kontenerze należy użyć polecenia: `docker run s23020/pja-asi-12c-gr2:v1`.  
+**3.** Utworzyć obraz Docker do treningu modelu: `docker-compose build train`
+**4.** Utworzyć obraz Docker dla aplikacji korzystającej z wytrenowanego modelu: `docker-compose build api`
+**5.** Aby uruchomić trenowanie modelu w kontenerze należy użyć polecenia: `docker-compose up train`.  
+**6.** Aby uruchomić aplikację w kontenerze należy użyć polecenia: `docker-compose up api`.  

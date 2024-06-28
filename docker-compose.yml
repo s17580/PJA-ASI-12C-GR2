@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  train:
+    build:
+      context: .
+      dockerfile: Dockerfile.train
+    environment:
+      - KEDRO_PROJECT_PATH=/home/kedro_docker
+      - KEDRO_ENV=local
+      - KEDRO_PACKAGE_NAME=pja_asi_12c_gr2
+    volumes:
+      - type: volume
+        source: model_volume
+        target: /home/kedro_docker/data/06_model_output
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      - MODEL_PATH=/home/kedro_docker/data/06_model_output/best_model.pkl
+    volumes:
+      - type: volume
+        source: model_volume
+        target: /home/kedro_docker/data/06_model_output
+    ports:
+      - "8000:8000"
+
+volumes:
+  model_volume:

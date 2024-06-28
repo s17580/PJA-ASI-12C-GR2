@@ -86,7 +86,7 @@ def autogluon_train(
         val_data = make_column_names_unique(val_data)
 
         predictor = TabularPredictor(
-            label=params["target_column"], path="data\\03_models\\AutoML"
+            label=params["target_column"], path="data/03_models/AutoML"
         ).fit(
             train_data,
             tuning_data=val_data,
