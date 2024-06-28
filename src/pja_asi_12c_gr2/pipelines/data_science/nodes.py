@@ -62,7 +62,7 @@ def autogluon_train(
     This function performs the following steps:
 
     1. Ensures column names in both the training and validation datasets are unique.
-    2. Initializes a TabularPredictor from AutoGluon, specifying the target column.
+    2. Initializes a TabularPredictor from AutoGluon, specifying the target column and output path for generated models.
     3. Fits the predictor on the training data, using the validation data for hyperparameter tuning.
        The `presets` parameter (defaulting to "medium_quality_faster_train") controls the trade-off
        between model quality and training speed.
@@ -313,18 +313,27 @@ def evaluate_model(
 def generate_synthetic_data(
     real_data: pd.DataFrame, num_samples: int, max_attempts: int = 5
 ) -> pd.DataFrame:
-    """Generates synthetic data using the CTGAN model from SDV.
+    """Generates synthetic data using the CTGAN model from SDV, with error handling and retry mechanism.
+
+    This function attempts to create synthetic data that resembles the structure and distribution
+    of the `real_data`. It uses the CTGAN model and checks that the generated data has the same
+    number of columns as the original data and contains more than one class in the target column.
+    The process is repeated up to `max_attempts` times.
 
     Args:
-        real_data (pd.DataFrame): The original DataFrame used for training the model.
+        real_data (pd.DataFrame): The original DataFrame containing the real data used for training.
         num_samples (int): The number of synthetic samples to generate.
+        max_attempts (int, optional): Maximum number of attempts to generate synthetic data with
+                                     multiple classes in the target column. Defaults to 5.
 
     Returns:
-        pd.DataFrame: The generated synthetic data.
+        pd.DataFrame: The generated synthetic data if successful.
 
     Raises:
-        ValueError: If `num_samples` is not a positive integer.
-        Exception: If there are issues with the data format or if the CTGAN model fails to fit or sample.
+        ValueError:
+            * If `num_samples` is not a positive integer.
+            * If the function fails to generate synthetic data with more than one class in the
+              target column after the specified number of attempts.
     """
     logger = create_error_logger()
     attempt = 0
@@ -387,11 +396,16 @@ def retrain_model(
     This function performs the following steps:
 
     1. Concatenates the real and synthetic data into a combined dataset.
-    2. Splits the combined data into features (X) and the target variable (y), assuming the target is named "target".
-    3. Preprocesses the features using a ColumnTransformer that applies StandardScaler to numeric features and OneHotEncoder to categorical features.
-    4. Splits the preprocessed data into training (80%) and testing (20%) sets.
-    5. Retrains a logistic regression model using the provided parameters on the training data.
-    6. Evaluates the retrained model on the testing data using the F1 score.
+    2. Fills NaN values with '0' and drops 'Name' columns.
+    3. Verifies the presence of a "target" column and checks for missing values in this column.
+    4. Checks if the "target" column contains more than one class. If not, raises an error as binary classification is assumed.
+    5. Splits the combined data into features (X) and the target variable (y).
+    6. Preprocesses the features by:
+        - Scaling numeric features using `StandardScaler`.
+        - One-hot encoding categorical features using `OneHotEncoder`.
+    7. Splits the preprocessed data into training (80%) and testing (20%) sets.
+    8. Retrains a logistic regression model using the provided `params` on the training data.
+    9. Evaluates the retrained model on the testing data using the F1 score.
 
     Args:
         real_data (pd.DataFrame): The original DataFrame containing the real data.
@@ -401,10 +415,13 @@ def retrain_model(
     Returns:
         Tuple[Any, Dict[str, float]]: A tuple containing:
             * The retrained model object (LogisticRegression).
-            * A dictionary with the F1 score as the evaluation result.
+            * A dictionary with the F1 score as the evaluation result, under the key 'f1'.
 
     Raises:
-        Exception: If an error occurs during data preprocessing, model training, or evaluation (logged for debugging).
+        KeyError: If the "target" column is missing from the combined data.
+        ValueError: If the "target" column contains NaN values or only one class.
+        Exception: If an error occurs during data preprocessing, model training, or evaluation
+                   (logged for debugging).
     """
     logger = create_error_logger()
 

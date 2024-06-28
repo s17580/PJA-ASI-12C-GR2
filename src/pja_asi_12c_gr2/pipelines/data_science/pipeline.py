@@ -9,7 +9,8 @@ from .nodes import (
 
 
 def create_pipeline(**kwargs):
-    """Creates a Kedro pipeline for training and evaluating a Pokemon classification model.
+    """Creates a Kedro pipeline for training, evaluating, and potentially retraining a
+    Pokemon classification model.
 
     This pipeline performs the following steps:
 
@@ -19,19 +20,20 @@ def create_pipeline(**kwargs):
                    AutoML if 'params:autoML' is True.
     3. evaluate_model: Evaluates the trained model on the test data and calculates relevant
                        metrics.
-
-    Note:
-        The pipeline currently excludes commented-out nodes for generating synthetic data
-        and retraining the model on combined datasets.
+    4. generate_synthetic_data: Generates synthetic Pokemon data based on the real dataset.
+    5. retrain_model: Retrains the initially trained model (or a new model, if specified)
+                      using both real and synthetic data.
 
     Args:
         **kwargs: Additional keyword arguments that can be passed to Kedro nodes, including:
             * params:split_data: Parameters for data splitting.
             * params:machine_learning.<model_name>: Parameters for the chosen model.
             * params:autoML: A boolean indicating whether to use AutoML for model training.
+            * params:synthetic_data.num_samples: Number of synthetic samples to generate.
 
     Returns:
-        Pipeline: A Kedro pipeline object for Pokemon model training and evaluation.
+        Pipeline: A Kedro Pipeline object defining the model training, evaluation, and
+                  potential retraining workflow.
     """
     return Pipeline(
         [
