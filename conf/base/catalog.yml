@@ -28,8 +28,8 @@ evaluation_results:
 
 real_data:
   type: pandas.CSVDataset
-  filepath: data/07_intermediate/real_data.csv
+  filepath: data/07_retraining/real_data.csv
   
 synthetic_data:
   type: pandas.CSVDataset
-  filepath: data/07_intermediate/synthetic_data.csv
+  filepath: data/07_retraining/synthetic_data.csv
