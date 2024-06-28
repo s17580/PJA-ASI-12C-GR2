@@ -81,34 +81,3 @@ def create_error_logger() -> logging.Logger:
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.ERROR)
     return logger
-
-
-def release_model(classifier):
-    """Saves the trained classifier and evaluation results to the Kedro DataCatalog.
-
-    This function performs the following steps:
-
-    1. Initializes a KedroContext to access the DataCatalog.
-    2. Creates a dictionary of evaluation results indicating a successful model evaluation.
-    3. Saves the evaluation results dictionary to the DataCatalog under the key "evaluation_results".
-    4. Saves the trained classifier object to the DataCatalog under the key "classifier".
-
-    Args:
-        classifier: The trained classifier object to be saved.
-
-    Raises:
-        IOError: If an error occurs while saving the evaluation results or the classifier to the DataCatalog.
-    """
-    logger = create_error_logger()
-    try:
-        context = KedroContext()
-        catalog = context.catalog
-        evaluation_results = {
-            "status": "success",
-            "message": "Model evaluated successfully",
-        }
-        catalog.save("evaluation_results", evaluation_results)
-        catalog.save("classifier", classifier)
-    except IOError as e:
-        logger.error("IOError: %s", e)
-        raise

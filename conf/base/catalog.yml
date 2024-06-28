@@ -8,23 +8,23 @@ prepared_pokemons:
 
 classifier:
   type: pickle.PickleDataset
-  filepath: data/03_models/pokemon_classifier.pk
-  versioned: true
-
-release_model:
-  type: pickle.PickleDataset
-  filepath: data/04_model_output/release_model.pk
+  filepath: data/03_models/ML/pokemon_classifier.pk
   versioned: true
 
 metadata:
   type: tracking.JSONDataset
-  filepath: data/05_tracking/metadata.json
+  filepath: data/04_tracking/metadata.json
 
 evaluation_results:
   type: kedro_datasets.tracking.JSONDataset
-  filepath: data/06_reporting/evaluation_results.json
+  filepath: data/05_reporting/evaluation_results.json
   save_args:
     indent: 2
+
+best_model:
+  type: pickle.PickleDataset
+  filepath: data/06_model_output/best_model.pk
+  versioned: true
 
 real_data:
   type: pandas.CSVDataset

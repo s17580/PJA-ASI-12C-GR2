@@ -10,8 +10,9 @@ conf/**/*credentials*
 
 # ignore everything in the following folders
 data/03_models/**
-data/05_tracking/**
-data/06_reporting/**
+data/04_tracking/**
+data/05_reporting/**
+data/06_model_output/**
 data/07_retraining/synthetic_data.csv
 
 # data/**
