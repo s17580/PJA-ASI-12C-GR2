@@ -46,6 +46,7 @@ def select_best_model(
                    be logged for further investigation.
     """
     logger = create_error_logger()
+    wandb.init(project="PJA_SUML_11c_gr4")
 
     try:
         # Train with auto-gluon
