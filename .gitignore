@@ -9,16 +9,22 @@ conf/local/**
 conf/**/*credentials*
 
 # ignore everything in the following folders
-data/**
+data/03_models/**
+data/04_tracking/**
+data/05_reporting/**
+data/06_model_output/**
+data/07_retraining/synthetic_data.csv
+
+# data/**
 
 # except their sub-folders
-!data/**/
+# !data/**/
 
 # also keep all .gitkeep files
-!.gitkeep
+# !.gitkeep
 
 # keep also the example dataset
-!data/01_raw/*
+# !data/01_raw/*
 
 
 ##########################

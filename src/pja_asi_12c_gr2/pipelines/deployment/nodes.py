@@ -3,6 +3,8 @@ from typing import Dict, Any
 import pandas as pd
 from kedro.framework.context import KedroContext
 from pja_asi_12c_gr2.pipelines.data_science.nodes import train_model, evaluate_model
+import joblib
+import os
 
 
 def select_best_model(
@@ -61,10 +63,14 @@ def select_best_model(
         )
         regular_results = evaluate_model(x_test, y_test, regular_model, autoML=False)
 
-        # Compare
+        # Compare models and the best one
         if autoML_results["f1"] > regular_results["f1"]:
+            model_path = os.getenv("MODEL_PATH", "data/06_model_output/best_model.pkl")
+            joblib.dump(autoML_model, model_path)
             return autoML_model
         else:
+            model_path = os.getenv("MODEL_PATH", "data/06_model_output/best_model.pkl")
+            joblib.dump(regular_model, model_path)
             return regular_model
     except Exception as e:
         logger.error("Error in select_best_model: %s", e)
@@ -81,34 +87,3 @@ def create_error_logger() -> logging.Logger:
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.ERROR)
     return logger
-
-
-def release_model(classifier):
-    """Saves the trained classifier and evaluation results to the Kedro DataCatalog.
-
-    This function performs the following steps:
-
-    1. Initializes a KedroContext to access the DataCatalog.
-    2. Creates a dictionary of evaluation results indicating a successful model evaluation.
-    3. Saves the evaluation results dictionary to the DataCatalog under the key "evaluation_results".
-    4. Saves the trained classifier object to the DataCatalog under the key "classifier".
-
-    Args:
-        classifier: The trained classifier object to be saved.
-
-    Raises:
-        IOError: If an error occurs while saving the evaluation results or the classifier to the DataCatalog.
-    """
-    logger = create_error_logger()
-    try:
-        context = KedroContext()
-        catalog = context.catalog
-        evaluation_results = {
-            "status": "success",
-            "message": "Model evaluated successfully",
-        }
-        catalog.save("evaluation_results", evaluation_results)
-        catalog.save("classifier", classifier)
-    except IOError as e:
-        logger.error("IOError: %s", e)
-        raise
