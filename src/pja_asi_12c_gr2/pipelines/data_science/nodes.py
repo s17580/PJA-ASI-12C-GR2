@@ -1,3 +1,4 @@
+import wandb
 import logging
 from typing import Dict, Any, Tuple
 import pandas as pd
@@ -222,6 +223,7 @@ def train_model(
         Exception: If an error occurs during preprocessing, model training, or AutoGluon setup.
     """
     logger = create_error_logger()
+    wandb.init(project="PJA_SUML_11c_gr4")
     try:
         categorical_features = ["Type 1", "Type 2"]
         numeric_features = x_train.select_dtypes(include=["int64", "float64"]).columns
@@ -243,6 +245,7 @@ def train_model(
             val_data = val_data.rename(columns={"Legendary": "Legendary_1"})
             params["target_column"] = "Legendary_1"
             predictor = autogluon_train(train_data, val_data, params)
+            wandb.log({"train_params": params})
             return predictor
         else:
             classifier = DecisionTreeClassifier(
@@ -252,6 +255,7 @@ def train_model(
             )
             clf = Pipeline([("preprocessor", preprocessor), ("classifier", classifier)])
             clf.fit(x_train, y_train)
+            wandb.log({"train_params": params})
             return clf
     except Exception as e:
         logger.error("Failed to train model: %s", e)
@@ -287,6 +291,7 @@ def evaluate_model(
         OSError: If there's an issue with the operating system during evaluation (e.g., file access error).
     """
     logger = create_error_logger()
+    wandb.init(project="PJA_SUML_11c_gr4")
     try:
         if autoML:
             x_test = preprocess_test_data(x_test)
@@ -299,12 +304,16 @@ def evaluate_model(
         recall = recall_score(y_test, y_pred, average="weighted")
         f1 = f1_score(y_test, y_pred, average="weighted")
 
-        return {
+        metrics = {
             "accuracy": accuracy,
             "precision": precision,
             "recall": recall,
             "f1": f1,
         }
+        
+        wandb.log(metrics)
+
+        return metrics
     except (ValueError, KeyError, OSError) as e:
         logger.error("Model evaluation error: %s", e)
         raise

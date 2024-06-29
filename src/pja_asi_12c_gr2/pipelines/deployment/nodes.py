@@ -1,3 +1,4 @@
+import wandb
 import logging
 from typing import Dict, Any
 import pandas as pd
@@ -45,6 +46,7 @@ def select_best_model(
                    be logged for further investigation.
     """
     logger = create_error_logger()
+    wandb.init(project="PJA_SUML_11c_gr4")
 
     try:
         # Train with auto-gluon
@@ -67,10 +69,12 @@ def select_best_model(
         if autoML_results["f1"] > regular_results["f1"]:
             model_path = os.getenv("MODEL_PATH", "data/06_model_output/best_model.pkl")
             joblib.dump(autoML_model, model_path)
+            wandb.log({"best_model": "AutoML", "autoML_results": autoML_results})
             return autoML_model
         else:
             model_path = os.getenv("MODEL_PATH", "data/06_model_output/best_model.pkl")
             joblib.dump(regular_model, model_path)
+            wandb.log({"best_model": "Regular", "regular_results": regular_results})
             return regular_model
     except Exception as e:
         logger.error("Error in select_best_model: %s", e)
