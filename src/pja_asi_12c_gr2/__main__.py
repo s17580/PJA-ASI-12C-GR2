@@ -1,3 +1,12 @@
+import wandb
+
+# Initialize wandb
+wandb.login(key="28e2535d90ad48d1c2ce1332741d977c0628f8ef")
+
+# Start a new run with wandb
+wandb.init(project="PJA_SUML_11c_gr4")
+
+# Rest of the imports
 import pandas as pd
 import yaml
 import numpy as np
@@ -16,8 +25,6 @@ from pja_asi_12c_gr2.pipelines.data_science import (
     evaluate_model,
 )
 from pja_asi_12c_gr2.pipelines.deployment.nodes import select_best_model, release_model
-import wandb
-
 
 def _find_run_command(package_name):
     try:

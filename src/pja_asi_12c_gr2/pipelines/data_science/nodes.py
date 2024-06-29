@@ -1,3 +1,4 @@
+import wandb
 import logging
 from typing import Dict, Any, Tuple
 import pandas as pd
@@ -243,6 +244,7 @@ def train_model(
             val_data = val_data.rename(columns={"Legendary": "Legendary_1"})
             params["target_column"] = "Legendary_1"
             predictor = autogluon_train(train_data, val_data, params)
+            wandb.log({"train_params": params})
             return predictor
         else:
             classifier = DecisionTreeClassifier(
@@ -252,6 +254,7 @@ def train_model(
             )
             clf = Pipeline([("preprocessor", preprocessor), ("classifier", classifier)])
             clf.fit(x_train, y_train)
+            wandb.log({"train_params": params})
             return clf
     except Exception as e:
         logger.error("Failed to train model: %s", e)
@@ -299,12 +302,16 @@ def evaluate_model(
         recall = recall_score(y_test, y_pred, average="weighted")
         f1 = f1_score(y_test, y_pred, average="weighted")
 
-        return {
+        metrics = {
             "accuracy": accuracy,
             "precision": precision,
             "recall": recall,
             "f1": f1,
         }
+        
+        wandb.log(metrics)
+
+        return metrics
     except (ValueError, KeyError, OSError) as e:
         logger.error("Model evaluation error: %s", e)
         raise
